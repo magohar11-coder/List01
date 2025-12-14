@@ -1,0 +1,671 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LedgerMate | Full History Tracker</title>
+    
+    <style>
+        /* ------------------ CSS Styling (Main Layout) ------------------ */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #a18cd1, #fbc2eb); 
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        #marquee-container {
+            width: 100%;
+            overflow: hidden;
+            background-color: #6a1b9a;
+            padding: 10px 0;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        #marquee-text {
+            color: #ffffff;
+            font-size: 1.8em;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            white-space: nowrap;
+            display: inline-block;
+        }
+
+        #app-container {
+            background-color: white;
+            border-radius: 30px; 
+            padding: 30px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            width: 90%;
+            max-width: 500px;
+            margin-top: 20px; 
+            margin-bottom: 40px;
+            box-sizing: border-box; 
+        }
+
+        h1 {
+            color: #6a1b9a; 
+            text-align: center;
+            font-size: 1.8em;
+            margin-bottom: 25px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #e0e0e0;
+        }
+
+        /* Input Styles */
+        .item-entry {
+            display: flex;
+            gap: 8px; 
+            margin-bottom: 15px;
+            align-items: center;
+        }
+
+        .item-entry input[type="text"],
+        .item-entry input[type="number"] {
+            padding: 12px 10px;
+            border-radius: 12px; 
+            border: 1px solid #e0e0e0;
+            background-color: #f9f9f9;
+            box-sizing: border-box;
+            min-width: 0;
+        }
+        
+        .item-entry input[type="text"] {
+            flex-grow: 3;
+            flex-shrink: 1;
+        }
+        
+        .item-entry input[type="number"] {
+            flex-grow: 1;
+            flex-shrink: 1;
+            text-align: right;
+            max-width: 100px;
+        }
+
+        .delete-btn {
+            background-color: #ff4d4f;
+            color: white;
+            border: none;
+            border-radius: 12px; 
+            padding: 12px 12px; 
+            cursor: pointer;
+            font-size: 0.9em;
+            flex-shrink: 0; 
+        }
+
+        /* Button Group & Total Display */
+        #add-item-btn {
+            display: block;
+            width: 100%;
+            padding: 14px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 15px; 
+            font-size: 1.1em;
+            cursor: pointer;
+            margin-top: 15px;
+        }
+        
+        #clear-all-btn, #history-btn {
+            width: 48%;
+            padding: 14px;
+            border: none;
+            border-radius: 15px;
+            font-size: 1.1em;
+            cursor: pointer;
+        }
+
+        #clear-all-btn {
+            background-color: #ff9800; 
+            color: white;
+        }
+
+        #history-btn {
+            background-color: #03a9f4;
+            color: white;
+        }
+
+        #button-group {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 10px;
+        }
+
+        #total-display {
+            margin-top: 30px;
+            padding: 20px;
+            background-color: #ede7f6; 
+            border: 2px solid #6a1b9a;
+            border-radius: 15px;
+            font-size: 1.6em;
+            font-weight: bold;
+            text-align: center;
+            color: #6a1b9a;
+            box-shadow: 0 5px 15px rgba(106, 27, 154, 0.1);
+        }
+
+        /* ------------------ CALENDAR/HISTORY STYLING ------------------ */
+        #history-section {
+            background-color: white;
+            border-radius: 30px;
+            padding: 30px 15px; 
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            width: 90%;
+            max-width: 500px;
+            margin-top: 20px;
+            margin-bottom: 40px;
+            box-sizing: border-box;
+            display: none;
+        }
+        
+        /* New History Delete Button Style */
+        #clear-history-btn {
+            display: block;
+            width: 100%;
+            padding: 12px;
+            margin-top: 20px;
+            background-color: #d32f2f; /* Dark Red */
+            color: white;
+            border: 2px solid #ff4d4f;
+            border-radius: 15px;
+            font-size: 1em;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background-color 0.3s;
+        }
+        
+        #clear-history-btn:hover {
+            background-color: #c62828;
+        }
+
+
+        #calendar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            color: #6a1b9a;
+            font-size: 1.2em;
+            font-weight: bold;
+        }
+
+        #calendar-header button {
+            background: none;
+            border: none;
+            color: #03a9f4;
+            font-size: 1.5em;
+            cursor: pointer;
+            padding: 5px;
+        }
+
+        #calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 5px;
+            text-align: center;
+        }
+
+        .day-name {
+            font-weight: bold;
+            color: #888;
+            padding: 5px 0;
+            font-size: 0.8em;
+        }
+
+        .day-cell {
+            padding: 10px 0;
+            border-radius: 8px;
+            cursor: default;
+            color: #333;
+            font-size: 1em;
+            line-height: 1;
+            position: relative;
+        }
+
+        /* Days with saved purchases */
+        .purchase-day {
+            background-color: #c8e6c9;
+            color: #388e3c;
+            font-weight: bold;
+            cursor: pointer;
+            border: 2px solid #4CAF50;
+            transition: background-color 0.2s;
+        }
+
+        /* History Detail Panel */
+        #daily-total-display {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 10px;
+            background-color: #f0f8ff; /* Light blue panel */
+            border: 1px dashed #03a9f4;
+            min-height: 40px;
+        }
+        
+        .transaction-details {
+            border: 1px solid #ddd;
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 8px;
+            background-color: #fff;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        
+        .transaction-header {
+            font-weight: bold;
+            color: #6a1b9a;
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 5px;
+            padding-bottom: 5px;
+            border-bottom: 1px dotted #e0e0e0;
+            font-size: 1.1em;
+        }
+
+        .item-row {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.9em;
+            color: #555;
+            padding: 2px 0;
+        }
+        
+        /* Credits */
+        #credits {
+            font-size: 0.8em;
+            color: #ffffff; 
+            margin-top: 15px;
+            text-align: center;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+        }
+    </style>
+</head>
+<body>
+    
+    <div id="marquee-container">
+        <marquee behavior="scroll" direction="left" scrollamount="8">
+            <span id="marquee-text">Powered by M.A. Gohar | Powered by M.A. Gohar</span>
+        </marquee>
+    </div>
+
+    <div id="app-container">
+        <h1>Smart Shopping List 🛒</h1><h1>Powered By M.A.Gohar</h1>
+        
+        <div id="item-list">
+            </div>
+        
+        <button id="add-item-btn" onclick="addNewItem()">+ Add New Item</button>
+        
+        <div id="button-group">
+            <button id="clear-all-btn" onclick="clearAllItems()">Save & Clear List</button>
+            <button id="history-btn" onclick="toggleHistory()">View History Calendar</button>
+        </div>
+
+        <div id="total-display">
+            Total Amount: ₹ <span id="total-amount">0.00</span>
+        </div>
+    </div>
+
+    <div id="history-section">
+        <h2>Purchase Calendar</h2>
+
+        <div id="calendar-header">
+            <button onclick="changeMonth(-1)">&#9664;</button>
+            <span id="current-month-year"></span>
+            <button onclick="changeMonth(1)">&#9654;</button>
+        </div>
+
+        <div id="calendar-grid">
+            <div class="day-name">Sun</div>
+            <div class="day-name">Mon</div>
+            <div class="day-name">Tue</div>
+            <div class="day-name">Wed</div>
+            <div class="day-name">Thu</div>
+            <div class="day-name">Fri</div>
+            <div class="day-name">Sat</div>
+            </div>
+
+        <div id="daily-total-display">
+            Select a highlighted date to see all purchases made on that day.
+        </div>
+        
+        <button id="clear-history-btn" onclick="clearAllHistory()">Permanently Delete All History</button> 
+    </div>
+    
+    <div id="credits">Powered by M.A. Gohar</div>
+
+    <script>
+        // ------------------ JavaScript Logic ------------------
+
+        const CURRENT_LIST_KEY = 'ledgerMateCurrentList';
+        const HISTORY_KEY = 'ledgerMateHistory';
+        let itemIdCounter = 0; 
+        
+        let currentMonth = new Date().getMonth();
+        let currentYear = new Date().getFullYear();
+        let historyData = {}; 
+
+
+        // ------------------ DATA HANDLING ------------------
+
+        function loadItemsFromStorage() {
+            const stored = localStorage.getItem(CURRENT_LIST_KEY);
+            let items = [];
+            if (stored) {
+                items = JSON.parse(stored);
+            }
+            if (items.length > 0) {
+                itemIdCounter = Math.max(...items.map(item => item.id)) + 1;
+            } else {
+                itemIdCounter = 1;
+            }
+            if (items.length === 0) {
+                items.push({ id: itemIdCounter++, name: '', price: '' }); 
+            }
+            return items;
+        }
+
+        let items = loadItemsFromStorage();
+        
+        function syncUiToItems() {
+            items = Array.from(document.querySelectorAll('.item-entry')).map(entry => {
+                const priceValue = entry.querySelector('.price-input').value;
+                return {
+                    id: parseInt(entry.dataset.id),
+                    name: entry.querySelector('input[type="text"]').value,
+                    price: parseFloat(priceValue) || 0
+                };
+            });
+        }
+
+        function saveItemsToStorage() {
+            syncUiToItems(); 
+            const listData = items.filter(item => item.name.trim() !== '' || item.price > 0);
+            localStorage.setItem(CURRENT_LIST_KEY, JSON.stringify(listData));
+        }
+
+        
+        // ------------------ HISTORY & CALENDAR FUNCTIONS (Updated) ------------------
+
+        function formatDate(date) {
+            const y = date.getFullYear();
+            const m = String(date.getMonth() + 1).padStart(2, '0');
+            const d = String(date.getDate()).padStart(2, '0');
+            return `${y}-${m}-${d}`;
+        }
+
+        function loadAndProcessHistory() {
+            const storedHistory = localStorage.getItem(HISTORY_KEY);
+            const rawHistory = storedHistory ? JSON.parse(storedHistory) : [];
+            historyData = {}; 
+            
+            rawHistory.forEach(tx => {
+                const dateKey = tx.dateKey; 
+                if (!historyData[dateKey]) {
+                    historyData[dateKey] = [];
+                }
+                historyData[dateKey].push(tx);
+            });
+        }
+        
+        function saveHistory(currentList) {
+            if (currentList.length === 0) return; 
+
+            const today = new Date();
+            const dateKey = formatDate(today); 
+            const total = currentList.reduce((sum, item) => sum + (item.price || 0), 0);
+            
+            const newTransaction = {
+                id: today.getTime(), 
+                dateKey: dateKey,
+                dateTime: today.toLocaleString(),
+                total: total.toFixed(2),
+                items: currentList.filter(item => item.name.trim() || item.price > 0) 
+            };
+            
+            const storedHistory = localStorage.getItem(HISTORY_KEY);
+            let historyArray = storedHistory ? JSON.parse(storedHistory) : [];
+            
+            historyArray.push(newTransaction); 
+            
+            localStorage.setItem(HISTORY_KEY, JSON.stringify(historyArray));
+
+            loadAndProcessHistory(); 
+        }
+
+        function renderCalendar() {
+            loadAndProcessHistory(); 
+            
+            const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+            
+            document.getElementById('current-month-year').innerText = `${monthNames[currentMonth]} ${currentYear}`;
+            
+            const grid = document.getElementById('calendar-grid');
+            Array.from(grid.children).slice(7).forEach(child => child.remove());
+
+            const firstDay = new Date(currentYear, currentMonth, 1);
+            const startingDayOfWeek = firstDay.getDay(); 
+            const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+            
+            for (let i = 0; i < startingDayOfWeek; i++) {
+                const emptyCell = document.createElement('div');
+                emptyCell.classList.add('day-cell', 'empty-cell');
+                grid.appendChild(emptyCell);
+            }
+
+            for (let day = 1; day <= daysInMonth; day++) {
+                const date = new Date(currentYear, currentMonth, day);
+                const dateKey = formatDate(date);
+                const transactions = historyData[dateKey]; 
+                
+                const cell = document.createElement('div');
+                cell.classList.add('day-cell');
+                cell.innerText = day;
+                
+                if (transactions && transactions.length > 0) {
+                    cell.classList.add('purchase-day');
+                    cell.onclick = () => showDailyTotal(dateKey); 
+                } else {
+                    cell.classList.add('empty-cell');
+                }
+                
+                grid.appendChild(cell);
+            }
+            
+            document.getElementById('daily-total-display').innerText = historyData && Object.keys(historyData).length > 0
+                ? "Select a highlighted date to see all purchases made on that day."
+                : "No history found. Save a list to start tracking!";
+        }
+        
+        function showDailyTotal(dateKey) {
+            const display = document.getElementById('daily-total-display');
+            const transactions = historyData[dateKey];
+            
+            const dateParts = dateKey.split('-');
+            const displayDate = new Date(dateParts[0], dateParts[1] - 1, dateParts[2]).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+
+            let html = `<h3>Purchases on ${displayDate} (${transactions.length} Transactions)</h3>`;
+            
+            transactions.forEach((tx, index) => {
+                html += `
+                    <div class="transaction-details">
+                        <div class="transaction-header">
+                            <span>Transaction #${index + 1}</span>
+                            <span>Total: ₹ ${tx.total}</span>
+                        </div>
+                `;
+                
+                tx.items.forEach(item => {
+                    html += `
+                        <div class="item-row">
+                            <span>${item.name || '(No Name)'}</span>
+                            <span>₹ ${item.price.toFixed(2)}</span>
+                        </div>
+                    `;
+                });
+                
+                html += `</div>`;
+            });
+
+            display.innerHTML = html;
+        }
+
+        function changeMonth(step) {
+            currentMonth += step;
+            if (currentMonth > 11) {
+                currentMonth = 0;
+                currentYear++;
+            } else if (currentMonth < 0) {
+                currentMonth = 11;
+                currentYear--;
+            }
+            renderCalendar();
+        }
+
+        function toggleHistory() {
+            const historySection = document.getElementById('history-section');
+            const historyButton = document.getElementById('history-btn');
+
+            if (historySection.style.display === 'block') {
+                historySection.style.display = 'none';
+                historyButton.innerText = 'View History Calendar';
+            } else {
+                renderCalendar(); 
+                historySection.style.display = 'block';
+                historyButton.innerText = 'Hide Calendar';
+            }
+        }
+        
+        // NEW FUNCTION: PERMANENTLY DELETE ALL HISTORY
+        function clearAllHistory() {
+            if (confirm("WARNING: Are you sure you want to PERMANENTLY delete ALL saved purchase history? This action cannot be undone.")) {
+                localStorage.removeItem(HISTORY_KEY);
+                // Clear the in-memory processed data
+                historyData = {};
+                
+                // Reset calendar date to current month/year
+                currentMonth = new Date().getMonth();
+                currentYear = new Date().getFullYear();
+                
+                // Re-render the calendar to show it's empty
+                renderCalendar(); 
+                
+                // Update the history display to show a message
+                document.getElementById('daily-total-display').innerText = "All history has been permanently deleted.";
+                
+                alert("All history has been permanently deleted.");
+            }
+        }
+
+
+        // ------------------ CORE APP LOGIC ------------------
+
+        function handleEnter(event) {
+            if (event.key === 'Enter' || event.keyCode === 13) {
+                event.preventDefault(); 
+                addNewItem(); 
+            }
+        }
+
+        function renderItems() {
+            const list = document.getElementById('item-list');
+            list.innerHTML = '';
+            
+            if (items.length === 0) {
+                items.push({ id: itemIdCounter++, name: '', price: '' });
+            }
+            
+            items.forEach(item => {
+                const priceValue = item.price > 0 ? item.price : item.price === 0 ? '' : item.price;
+
+                const newItemHtml = `
+                    <div class="item-entry" data-id="${item.id}">
+                        <input type="text" placeholder="Item Name" value="${item.name}" 
+                               oninput="saveItemsToStorage()">
+                        <input type="number" class="price-input" placeholder="Price" min="0" value="${item.price > 0 ? item.price : ''}" 
+                               oninput="calculateTotal(); saveItemsToStorage()" 
+                               onkeypress="handleEnter(event)">
+                        <button class="delete-btn" onclick="deleteItem(${item.id})">Delete</button>
+                    </div>
+                `;
+                list.insertAdjacentHTML('beforeend', newItemHtml);
+            });
+            calculateTotal();
+        }
+
+        function addNewItem() {
+            syncUiToItems(); 
+            saveItemsToStorage(); 
+            
+            const newId = itemIdCounter++;
+            items.push({ id: newId, name: '', price: '' });
+            
+            renderItems(); 
+            
+            document.querySelector(`[data-id="${newId}"] input[type="text"]`).focus();
+        }
+        
+        function deleteItem(id) {
+            items = items.filter(item => item.id !== id);
+            renderItems();
+            saveItemsToStorage();
+        }
+        
+        function clearAllItems() {
+            syncUiToItems(); 
+            const listToSave = items.filter(item => item.name.trim() !== '' || item.price > 0);
+            const total = calculateTotal();
+
+            if (total > 0) {
+                 if (confirm(`Do you want to save ${listToSave.length} item(s) (Total: ₹ ${total.toFixed(2)}) and clear the list?`)) {
+                    saveHistory(listToSave);
+                    
+                    localStorage.removeItem(CURRENT_LIST_KEY);
+                    items = []; 
+                    itemIdCounter = 1; 
+                    renderItems(); 
+                    
+                    if (document.getElementById('history-section').style.display === 'block') {
+                        renderCalendar();
+                    }
+                    alert("Purchase saved and list cleared!");
+                }
+            } else {
+                 if (confirm("Clear the empty list?")) {
+                    localStorage.removeItem(CURRENT_LIST_KEY);
+                    items = []; 
+                    itemIdCounter = 1; 
+                    renderItems();
+                }
+            }
+        }
+
+        function calculateTotal() {
+            const priceInputs = document.querySelectorAll('.price-input');
+            let total = 0;
+
+            priceInputs.forEach(input => {
+                const price = parseFloat(input.value) || 0;
+                total += price;
+            });
+
+            const formattedTotal = total.toFixed(2);
+            document.getElementById('total-amount').innerText = formattedTotal;
+            return total;
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            renderItems(); 
+            loadAndProcessHistory(); 
+        });
+    </script>
+
+</body>
+</html>
