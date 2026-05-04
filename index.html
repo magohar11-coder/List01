@@ -3,669 +3,311 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LedgerMate | Full History Tracker</title>
-    
+    <title>LedgerMate V.7 | M.A. Gohar</title>
     <style>
-        /* ------------------ CSS Styling (Main Layout) ------------------ */
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #a18cd1, #fbc2eb); 
-            margin: 0;
-            padding: 0;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            min-height: 100vh;
+        :root {
+            --primary-green: #00ff41;
+            --dark-green: #003b00;
+            --radar-bg: #050a05;
+            --danger-red: #ff0000;
+            --bg-dark: #0d0d0d;
+            --glass-white: rgba(255, 255, 255, 0.98);
         }
 
-        #marquee-container {
-            width: 100%;
-            overflow: hidden;
-            background-color: #6a1b9a;
-            padding: 10px 0;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
-            margin-bottom: 20px;
-            text-align: center;
-        }
-        #marquee-text {
-            color: #ffffff;
-            font-size: 1.8em;
-            font-weight: 900;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            white-space: nowrap;
-            display: inline-block;
-        }
-
-        #app-container {
-            background-color: white;
-            border-radius: 30px; 
-            padding: 30px;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
-            width: 90%;
-            max-width: 500px;
-            margin-top: 20px; 
-            margin-bottom: 40px;
-            box-sizing: border-box; 
-        }
-
-        h1 {
-            color: #6a1b9a; 
-            text-align: center;
-            font-size: 1.8em;
-            margin-bottom: 25px;
-            padding-bottom: 10px;
-            border-bottom: 2px solid #e0e0e0;
-        }
-
-        /* Input Styles */
-        .item-entry {
-            display: flex;
-            gap: 8px; 
-            margin-bottom: 15px;
-            align-items: center;
-        }
-
-        .item-entry input[type="text"],
-        .item-entry input[type="number"] {
-            padding: 12px 10px;
-            border-radius: 12px; 
-            border: 1px solid #e0e0e0;
-            background-color: #f9f9f9;
-            box-sizing: border-box;
-            min-width: 0;
-        }
+        body { font-family: 'Consolas', 'Segoe UI', monospace; background-color: var(--bg-dark); margin: 0; display: flex; flex-direction: column; align-items: center; min-height: 100vh; color: #fff; }
         
-        .item-entry input[type="text"] {
-            flex-grow: 3;
-            flex-shrink: 1;
-        }
+        #marquee-container { width: 100%; background-color: #000; border-bottom: 1px solid var(--primary-green); padding: 5px 0; color: var(--primary-green); text-shadow: 0 0 5px var(--primary-green); font-weight: bold; }
+
+        /* --- REALISTIC RADAR --- */
+        #radar-section { background-color: var(--radar-bg); width: 100%; display: flex; justify-content: center; padding: 20px 0; border-bottom: 2px solid #222; position: relative; }
+        .radar-container { width: 140px; height: 140px; position: relative; border-radius: 50%; background: radial-gradient(circle, #0a200a 0%, #050a05 100%); border: 3px solid #333; box-shadow: 0 0 20px rgba(0,0,0,0.5); overflow: hidden; }
+        .radar-container::before { content: ""; position: absolute; top: 0; left: 0; right: 0; bottom: 0; border-radius: 50%; background-image: radial-gradient(circle, transparent 20%, rgba(0, 255, 65, 0.1) 21%, transparent 22%, transparent 40%, rgba(0, 255, 65, 0.1) 41%, transparent 42%); }
+        .sweep { width: 50%; height: 50%; background: conic-gradient(from 0deg, var(--primary-green) 0%, transparent 30%); position: absolute; top: 0; left: 50%; transform-origin: bottom left; animation: rotate 4s linear infinite; filter: blur(1px); }
+        .radar-container.over { border-color: var(--danger-red); box-shadow: 0 0 30px rgba(255, 0, 0, 0.4); }
+        .radar-container.over .sweep { background: conic-gradient(from 0deg, var(--danger-red) 0%, transparent 40%); animation: rotate 1s linear infinite; }
+        @keyframes rotate { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+
+        /* --- APP CONTENT --- */
+        #app-container, #history-section { background: var(--glass-white); color: #333; border-radius: 25px; padding: 20px; width: 92%; max-width: 450px; margin: -15px 0 20px 0; position: relative; z-index: 10; box-shadow: 0 10px 40px rgba(0,0,0,0.5); box-sizing: border-box; }
         
-        .item-entry input[type="number"] {
-            flex-grow: 1;
-            flex-shrink: 1;
-            text-align: right;
-            max-width: 100px;
-        }
+        /* BRANDING & TOTAL */
+        .branding-text { text-align: center; font-size: 0.65em; font-weight: bold; color: #888; margin-bottom: 2px; letter-spacing: 1px; }
+        #total-display { padding: 15px; background: #eef7ee; border: 2px solid var(--primary-green); border-radius: 15px; text-align: center; font-weight: bold; font-size: 1.4em; margin-bottom: 15px; color: var(--dark-green); }
+        #total-display.over { border-color: var(--danger-red); background: #fff5f5; color: var(--danger-red); }
+        .diff-amount { font-size: 0.5em; display: block; color: var(--danger-red); }
 
-        .delete-btn {
-            background-color: #ff4d4f;
-            color: white;
-            border: none;
-            border-radius: 12px; 
-            padding: 12px 12px; 
-            cursor: pointer;
-            font-size: 0.9em;
-            flex-shrink: 0; 
-        }
+        .budget-box { background: #f0f0f0; padding: 12px; border-radius: 12px; border-left: 5px solid #666; display: flex; justify-content: space-between; margin-bottom: 20px; color: #333; font-size: 0.9em; }
+        .budget-box input { width: 80px; border: 1px solid #ccc; padding: 4px; border-radius: 5px; font-weight: bold; text-align: center; }
 
-        /* Button Group & Total Display */
-        #add-item-btn {
-            display: block;
-            width: 100%;
-            padding: 14px;
-            background-color: #4CAF50;
-            color: white;
-            border: none;
-            border-radius: 15px; 
-            font-size: 1.1em;
-            cursor: pointer;
-            margin-top: 15px;
-        }
+        .item-entry { display: flex; gap: 8px; margin-bottom: 10px; }
+        .item-entry input { padding: 10px; border-radius: 8px; border: 1px solid #ddd; font-size: 14px; background: #fff; color: #333; }
         
-        #clear-all-btn, #history-btn {
-            width: 48%;
-            padding: 14px;
-            border: none;
-            border-radius: 15px;
-            font-size: 1.1em;
-            cursor: pointer;
-        }
-
-        #clear-all-btn {
-            background-color: #ff9800; 
-            color: white;
-        }
-
-        #history-btn {
-            background-color: #03a9f4;
-            color: white;
-        }
-
-        #button-group {
-            display: flex;
-            justify-content: space-between;
-            margin-top: 10px;
-        }
-
-        #total-display {
-            margin-top: 30px;
-            padding: 20px;
-            background-color: #ede7f6; 
-            border: 2px solid #6a1b9a;
-            border-radius: 15px;
-            font-size: 1.6em;
-            font-weight: bold;
-            text-align: center;
-            color: #6a1b9a;
-            box-shadow: 0 5px 15px rgba(106, 27, 154, 0.1);
-        }
-
-        /* ------------------ CALENDAR/HISTORY STYLING ------------------ */
-        #history-section {
-            background-color: white;
-            border-radius: 30px;
-            padding: 30px 15px; 
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
-            width: 90%;
-            max-width: 500px;
-            margin-top: 20px;
-            margin-bottom: 40px;
-            box-sizing: border-box;
-            display: none;
-        }
+        button { border: none; border-radius: 10px; padding: 12px; font-weight: bold; cursor: pointer; transition: 0.2s; }
+        #add-item-btn { width: 100%; background: #eee; color: #333; margin-bottom: 15px; border: 1px dashed #999; }
         
-        /* New History Delete Button Style */
-        #clear-history-btn {
-            display: block;
-            width: 100%;
-            padding: 12px;
-            margin-top: 20px;
-            background-color: #d32f2f; /* Dark Red */
-            color: white;
-            border: 2px solid #ff4d4f;
-            border-radius: 15px;
-            font-size: 1em;
-            cursor: pointer;
-            font-weight: bold;
-            transition: background-color 0.3s;
-        }
-        
-        #clear-history-btn:hover {
-            background-color: #c62828;
-        }
+        .btn-row { display: flex; gap: 10px; }
+        .btn-row button { flex: 1; }
+        #save-btn { background: #2e7d32; color: white; }
+        #history-toggle-btn { background: #1565c0; color: white; }
+        .delete-btn { background: #ffebee; color: #c62828; }
 
-
-        #calendar-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-            color: #6a1b9a;
-            font-size: 1.2em;
-            font-weight: bold;
-        }
-
-        #calendar-header button {
-            background: none;
-            border: none;
-            color: #03a9f4;
-            font-size: 1.5em;
-            cursor: pointer;
-            padding: 5px;
-        }
-
-        #calendar-grid {
-            display: grid;
-            grid-template-columns: repeat(7, 1fr);
-            gap: 5px;
-            text-align: center;
-        }
-
-        .day-name {
-            font-weight: bold;
-            color: #888;
-            padding: 5px 0;
-            font-size: 0.8em;
-        }
-
-        .day-cell {
-            padding: 10px 0;
-            border-radius: 8px;
-            cursor: default;
-            color: #333;
-            font-size: 1em;
-            line-height: 1;
-            position: relative;
-        }
-
-        /* Days with saved purchases */
-        .purchase-day {
-            background-color: #c8e6c9;
-            color: #388e3c;
-            font-weight: bold;
-            cursor: pointer;
-            border: 2px solid #4CAF50;
-            transition: background-color 0.2s;
-        }
-
-        /* History Detail Panel */
-        #daily-total-display {
-            margin-top: 20px;
-            padding: 15px;
-            border-radius: 10px;
-            background-color: #f0f8ff; /* Light blue panel */
-            border: 1px dashed #03a9f4;
-            min-height: 40px;
-        }
-        
-        .transaction-details {
-            border: 1px solid #ddd;
-            padding: 10px;
-            margin-bottom: 10px;
-            border-radius: 8px;
-            background-color: #fff;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-        }
-        
-        .transaction-header {
-            font-weight: bold;
-            color: #6a1b9a;
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 5px;
-            padding-bottom: 5px;
-            border-bottom: 1px dotted #e0e0e0;
-            font-size: 1.1em;
-        }
-
-        .item-row {
-            display: flex;
-            justify-content: space-between;
-            font-size: 0.9em;
-            color: #555;
-            padding: 2px 0;
-        }
-        
-        /* Credits */
-        #credits {
-            font-size: 0.8em;
-            color: #ffffff; 
-            margin-top: 15px;
-            text-align: center;
-            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
-        }
+        /* CALENDAR & HISTORY */
+        #calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; text-align: center; margin-top: 10px; }
+        .day-cell { padding: 8px 0; border-radius: 5px; font-size: 0.85em; border: 1px solid #eee; }
+        .purchase-day { background: var(--primary-green); color: white; cursor: pointer; font-weight: bold; }
+        .history-card { border: 1px solid #ddd; padding: 10px; margin-top: 10px; border-radius: 12px; background: #fff; position: relative; }
+        .history-time { font-size: 0.7em; color: #1565c0; font-weight: bold; margin-bottom: 5px; border-bottom: 1px solid #eee; padding-bottom: 2px; }
     </style>
 </head>
 <body>
-    
+
     <div id="marquee-container">
-        <marquee behavior="scroll" direction="left" scrollamount="8">
-            <span id="marquee-text">Powered by M.A. Gohar | Powered by M.A. Gohar V.2</span>
-        </marquee>
+        <marquee>SYSTEM STATUS: SCANNING... SECURE | M.A. GOHAR</marquee>
+    </div>
+
+    <div id="radar-section">
+        <div class="radar-container" id="radarCont"><div class="sweep"></div></div>
     </div>
 
     <div id="app-container">
-        <h1>Smart Shopping List 🛒</h1><h1>Powered By M.A.Gohar V.1</h1>
-        
-        <div id="item-list">
-            </div>
-        
-        <button id="add-item-btn" onclick="addNewItem()">+ Add New Item</button>
-        
-        <div id="button-group">
-            <button id="clear-all-btn" onclick="clearAllItems()">Save & Clear List</button>
-            <button id="history-btn" onclick="toggleHistory()">View History Calendar</button>
-        </div>
-
+        <!-- TOTAL DISPLAY WITH BRANDING -->
+        <div class="branding-text">POWERED BY M.A. GOHAR</div>
         <div id="total-display">
-            Total Amount: ₹ <span id="total-amount">0.00</span>
+            TOTAL: ₹ <span id="total-amount">0.00</span>
+            <span id="budget-diff" class="diff-amount"></span>
+        </div>
+
+        <div class="budget-box">
+            <span>LIMIT BUDGET</span>
+            <div>₹ <input type="number" id="userBudget" value="1000" oninput="calculateTotal()"></div>
+        </div>
+
+        <div id="item-list"></div>
+        <button id="add-item-btn" onclick="addNewItem()">+ Add Item (Enter)</button>
+
+        <div class="btn-row">
+            <button id="save-btn" onclick="clearAndSave()">SAVE LOG</button>
+            <button id="history-toggle-btn" onclick="toggleHistory()">HISTORY</button>
         </div>
     </div>
 
-    <div id="history-section">
-        <h2>Purchase Calendar</h2>
-
-        <div id="calendar-header">
-            <button onclick="changeMonth(-1)">&#9664;</button>
-            <span id="current-month-year"></span>
-            <button onclick="changeMonth(1)">&#9654;</button>
+    <div id="history-section" style="display:none;">
+        <h2 style="color:#333; font-size:1.1em; text-align:center;">History Calendar</h2>
+        <div style="display:flex; justify-content: space-between; align-items:center; margin-bottom:10px;">
+            <button onclick="changeMonth(-1)">◀</button>
+            <span id="month-year-label" style="font-weight:bold; color:#333;"></span>
+            <button onclick="changeMonth(1)">▶</button>
         </div>
-
         <div id="calendar-grid">
-            <div class="day-name">Sun</div>
-            <div class="day-name">Mon</div>
-            <div class="day-name">Tue</div>
-            <div class="day-name">Wed</div>
-            <div class="day-name">Thu</div>
-            <div class="day-name">Fri</div>
-            <div class="day-name">Sat</div>
-            </div>
-
-        <div id="daily-total-display">
-            Select a highlighted date to see all purchases made on that day.
+            <div style="color:#888">S</div><div style="color:#888">M</div><div style="color:#888">T</div><div style="color:#888">W</div><div style="color:#888">T</div><div style="color:#888">F</div><div style="color:#888">S</div>
         </div>
-        
-        <button id="clear-history-btn" onclick="clearAllHistory()">Permanently Delete All History</button> 
+        <div id="daily-total-display" style="margin-top:15px; color:#333; font-size:0.9em;">Select a green date to see time & items.</div>
+        <button id="clear-date-history-btn" style="display:none; background:#d32f2f; color:white; width:100%; margin-top:10px;" onclick="deleteSpecificDateHistory()">Delete Date Data</button>
     </div>
-    
-    <div id="credits">Powered by M.A. Gohar</div>
 
     <script>
-        // ------------------ JavaScript Logic ------------------
-
-        const CURRENT_LIST_KEY = 'ledgerMateCurrentList';
-        const HISTORY_KEY = 'ledgerMateHistory';
-        let itemIdCounter = 0; 
-        
+        const STORAGE_KEY = 'ledgerMate_Current';
+        const HISTORY_KEY = 'ledgerMate_History';
+        let items = [];
+        let historyData = {};
         let currentMonth = new Date().getMonth();
         let currentYear = new Date().getFullYear();
-        let historyData = {}; 
+        let selectedDateKey = null;
+        let audioContext = null;
 
+        function getAudioContext() {
+            if (!audioContext) audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            return audioContext;
+        }
 
-        // ------------------ DATA HANDLING ------------------
-
-        function loadItemsFromStorage() {
-            const stored = localStorage.getItem(CURRENT_LIST_KEY);
-            let items = [];
-            if (stored) {
-                items = JSON.parse(stored);
+        function playBeep(freq, duration, count = 1) {
+            const ctx = getAudioContext();
+            for (let i = 0; i < count; i++) {
+                setTimeout(() => {
+                    const osc = ctx.createOscillator();
+                    const gain = ctx.createGain();
+                    osc.type = 'square';
+                    osc.frequency.setValueAtTime(freq, ctx.currentTime);
+                    osc.connect(gain); gain.connect(ctx.destination);
+                    gain.gain.setValueAtTime(0, ctx.currentTime);
+                    gain.gain.linearRampToValueAtTime(0.2, ctx.currentTime + 0.02);
+                    gain.gain.linearRampToValueAtTime(0, ctx.currentTime + duration);
+                    osc.start(); osc.stop(ctx.currentTime + duration);
+                }, i * 200);
             }
-            if (items.length > 0) {
-                itemIdCounter = Math.max(...items.map(item => item.id)) + 1;
-            } else {
-                itemIdCounter = 1;
-            }
-            if (items.length === 0) {
-                items.push({ id: itemIdCounter++, name: '', price: '' }); 
-            }
-            return items;
         }
 
-        let items = loadItemsFromStorage();
-        
-        function syncUiToItems() {
-            items = Array.from(document.querySelectorAll('.item-entry')).map(entry => {
-                const priceValue = entry.querySelector('.price-input').value;
-                return {
-                    id: parseInt(entry.dataset.id),
-                    name: entry.querySelector('input[type="text"]').value,
-                    price: parseFloat(priceValue) || 0
-                };
-            });
-        }
-
-        function saveItemsToStorage() {
-            syncUiToItems(); 
-            const listData = items.filter(item => item.name.trim() !== '' || item.price > 0);
-            localStorage.setItem(CURRENT_LIST_KEY, JSON.stringify(listData));
-        }
-
-        
-        // ------------------ HISTORY & CALENDAR FUNCTIONS (Updated) ------------------
-
-        function formatDate(date) {
-            const y = date.getFullYear();
-            const m = String(date.getMonth() + 1).padStart(2, '0');
-            const d = String(date.getDate()).padStart(2, '0');
-            return `${y}-${m}-${d}`;
-        }
-
-        function loadAndProcessHistory() {
-            const storedHistory = localStorage.getItem(HISTORY_KEY);
-            const rawHistory = storedHistory ? JSON.parse(storedHistory) : [];
-            historyData = {}; 
+        function calculateTotal() {
+            const priceInputs = document.querySelectorAll('.price-input');
+            const budget = parseFloat(document.getElementById('userBudget').value) || 0;
+            let total = 0;
+            priceInputs.forEach(input => total += parseFloat(input.value) || 0);
             
-            rawHistory.forEach(tx => {
-                const dateKey = tx.dateKey; 
-                if (!historyData[dateKey]) {
-                    historyData[dateKey] = [];
+            document.getElementById('total-amount').innerText = total.toFixed(2);
+            const radar = document.getElementById('radarCont');
+            const display = document.getElementById('total-display');
+            const diffSpan = document.getElementById('budget-diff');
+
+            if (total > budget && budget > 0) {
+                if(!radar.classList.contains('over')) { 
+                    playBeep(600, 0.3, 3); 
                 }
-                historyData[dateKey].push(tx);
-            });
-        }
-        
-        function saveHistory(currentList) {
-            if (currentList.length === 0) return; 
-
-            const today = new Date();
-            const dateKey = formatDate(today); 
-            const total = currentList.reduce((sum, item) => sum + (item.price || 0), 0);
-            
-            const newTransaction = {
-                id: today.getTime(), 
-                dateKey: dateKey,
-                dateTime: today.toLocaleString(),
-                total: total.toFixed(2),
-                items: currentList.filter(item => item.name.trim() || item.price > 0) 
-            };
-            
-            const storedHistory = localStorage.getItem(HISTORY_KEY);
-            let historyArray = storedHistory ? JSON.parse(storedHistory) : [];
-            
-            historyArray.push(newTransaction); 
-            
-            localStorage.setItem(HISTORY_KEY, JSON.stringify(historyArray));
-
-            loadAndProcessHistory(); 
-        }
-
-        function renderCalendar() {
-            loadAndProcessHistory(); 
-            
-            const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
-            
-            document.getElementById('current-month-year').innerText = `${monthNames[currentMonth]} ${currentYear}`;
-            
-            const grid = document.getElementById('calendar-grid');
-            Array.from(grid.children).slice(7).forEach(child => child.remove());
-
-            const firstDay = new Date(currentYear, currentMonth, 1);
-            const startingDayOfWeek = firstDay.getDay(); 
-            const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
-            
-            for (let i = 0; i < startingDayOfWeek; i++) {
-                const emptyCell = document.createElement('div');
-                emptyCell.classList.add('day-cell', 'empty-cell');
-                grid.appendChild(emptyCell);
+                radar.classList.add('over');
+                display.classList.add('over');
+                diffSpan.innerText = `ALERT: -₹${(total - budget).toFixed(2)}`;
+            } else {
+                radar.classList.remove('over');
+                display.classList.remove('over');
+                diffSpan.innerText = "";
             }
+            saveCurrentState();
+        }
 
-            for (let day = 1; day <= daysInMonth; day++) {
-                const date = new Date(currentYear, currentMonth, day);
-                const dateKey = formatDate(date);
-                const transactions = historyData[dateKey]; 
-                
-                const cell = document.createElement('div');
-                cell.classList.add('day-cell');
-                cell.innerText = day;
-                
-                if (transactions && transactions.length > 0) {
-                    cell.classList.add('purchase-day');
-                    cell.onclick = () => showDailyTotal(dateKey); 
+        function handleEnter(event, index, field) {
+            if (event.key === "Enter") {
+                if (field === 'name') {
+                    document.querySelectorAll('.price-input')[index].focus();
                 } else {
-                    cell.classList.add('empty-cell');
+                    playBeep(1200, 0.1);
+                    addNewItem();
                 }
-                
-                grid.appendChild(cell);
-            }
-            
-            document.getElementById('daily-total-display').innerText = historyData && Object.keys(historyData).length > 0
-                ? "Select a highlighted date to see all purchases made on that day."
-                : "No history found. Save a list to start tracking!";
-        }
-        
-        function showDailyTotal(dateKey) {
-            const display = document.getElementById('daily-total-display');
-            const transactions = historyData[dateKey];
-            
-            const dateParts = dateKey.split('-');
-            const displayDate = new Date(dateParts[0], dateParts[1] - 1, dateParts[2]).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
-
-            let html = `<h3>Purchases on ${displayDate} (${transactions.length} Transactions)</h3>`;
-            
-            transactions.forEach((tx, index) => {
-                html += `
-                    <div class="transaction-details">
-                        <div class="transaction-header">
-                            <span>Transaction #${index + 1}</span>
-                            <span>Total: ₹ ${tx.total}</span>
-                        </div>
-                `;
-                
-                tx.items.forEach(item => {
-                    html += `
-                        <div class="item-row">
-                            <span>${item.name || '(No Name)'}</span>
-                            <span>₹ ${item.price.toFixed(2)}</span>
-                        </div>
-                    `;
-                });
-                
-                html += `</div>`;
-            });
-
-            display.innerHTML = html;
-        }
-
-        function changeMonth(step) {
-            currentMonth += step;
-            if (currentMonth > 11) {
-                currentMonth = 0;
-                currentYear++;
-            } else if (currentMonth < 0) {
-                currentMonth = 11;
-                currentYear--;
-            }
-            renderCalendar();
-        }
-
-        function toggleHistory() {
-            const historySection = document.getElementById('history-section');
-            const historyButton = document.getElementById('history-btn');
-
-            if (historySection.style.display === 'block') {
-                historySection.style.display = 'none';
-                historyButton.innerText = 'View History Calendar';
-            } else {
-                renderCalendar(); 
-                historySection.style.display = 'block';
-                historyButton.innerText = 'Hide Calendar';
-            }
-        }
-        
-        // NEW FUNCTION: PERMANENTLY DELETE ALL HISTORY
-        function clearAllHistory() {
-            if (confirm("WARNING: Are you sure you want to PERMANENTLY delete ALL saved purchase history? This action cannot be undone.")) {
-                localStorage.removeItem(HISTORY_KEY);
-                // Clear the in-memory processed data
-                historyData = {};
-                
-                // Reset calendar date to current month/year
-                currentMonth = new Date().getMonth();
-                currentYear = new Date().getFullYear();
-                
-                // Re-render the calendar to show it's empty
-                renderCalendar(); 
-                
-                // Update the history display to show a message
-                document.getElementById('daily-total-display').innerText = "All history has been permanently deleted.";
-                
-                alert("All history has been permanently deleted.");
-            }
-        }
-
-
-        // ------------------ CORE APP LOGIC ------------------
-
-        function handleEnter(event) {
-            if (event.key === 'Enter' || event.keyCode === 13) {
-                event.preventDefault(); 
-                addNewItem(); 
             }
         }
 
         function renderItems() {
             const list = document.getElementById('item-list');
             list.innerHTML = '';
-            
-            if (items.length === 0) {
-                items.push({ id: itemIdCounter++, name: '', price: '' });
-            }
-            
-            items.forEach(item => {
-                const priceValue = item.price > 0 ? item.price : item.price === 0 ? '' : item.price;
-
-                const newItemHtml = `
-                    <div class="item-entry" data-id="${item.id}">
-                        <input type="text" placeholder="Item Name" value="${item.name}" 
-                               oninput="saveItemsToStorage()">
-                        <input type="number" class="price-input" placeholder="Price" min="0" value="${item.price > 0 ? item.price : ''}" 
-                               oninput="calculateTotal(); saveItemsToStorage()" 
-                               onkeypress="handleEnter(event)">
-                        <button class="delete-btn" onclick="deleteItem(${item.id})">Delete</button>
-                    </div>
-                `;
-                list.insertAdjacentHTML('beforeend', newItemHtml);
+            if(items.length === 0) items.push({id: Date.now(), name: '', price: ''});
+            items.forEach((item, index) => {
+                const div = document.createElement('div');
+                div.className = 'item-entry';
+                div.innerHTML = `
+                    <input type="text" placeholder="Item" style="flex:3" value="${item.name}" oninput="updateItem(${item.id}, 'name', this.value)" onkeydown="handleEnter(event, ${index}, 'name')">
+                    <input type="number" class="price-input" placeholder="₹" style="flex:1.5" value="${item.price}" oninput="updateItem(${item.id}, 'price', this.value)" onkeydown="handleEnter(event, ${index}, 'price')">
+                    <button class="delete-btn" onclick="deleteItem(${item.id})">✖</button>`;
+                list.appendChild(div);
             });
-            calculateTotal();
+        }
+
+        function updateItem(id, field, value) {
+            const item = items.find(i => i.id === id);
+            if(item) { item[field] = value; calculateTotal(); }
         }
 
         function addNewItem() {
-            syncUiToItems(); 
-            saveItemsToStorage(); 
-            
-            const newId = itemIdCounter++;
-            items.push({ id: newId, name: '', price: '' });
-            
-            renderItems(); 
-            
-            document.querySelector(`[data-id="${newId}"] input[type="text"]`).focus();
-        }
-        
-        function deleteItem(id) {
-            items = items.filter(item => item.id !== id);
+            items.push({id: Date.now(), name: '', price: ''});
             renderItems();
-            saveItemsToStorage();
+            setTimeout(() => {
+                const inputs = document.querySelectorAll('.item-entry input[type="text"]');
+                inputs[inputs.length - 1].focus();
+            }, 10);
         }
-        
-        function clearAllItems() {
-            syncUiToItems(); 
-            const listToSave = items.filter(item => item.name.trim() !== '' || item.price > 0);
-            const total = calculateTotal();
 
-            if (total > 0) {
-                 if (confirm(`Do you want to save ${listToSave.length} item(s) (Total: ₹ ${total.toFixed(2)}) and clear the list?`)) {
-                    saveHistory(listToSave);
-                    
-                    localStorage.removeItem(CURRENT_LIST_KEY);
-                    items = []; 
-                    itemIdCounter = 1; 
-                    renderItems(); 
-                    
-                    if (document.getElementById('history-section').style.display === 'block') {
-                        renderCalendar();
-                    }
-                    alert("Purchase saved and list cleared!");
-                }
-            } else {
-                 if (confirm("Clear the empty list?")) {
-                    localStorage.removeItem(CURRENT_LIST_KEY);
-                    items = []; 
-                    itemIdCounter = 1; 
-                    renderItems();
-                }
+        function deleteItem(id) { items = items.filter(i => i.id !== id); renderItems(); calculateTotal(); }
+
+        function clearAndSave() {
+            const total = parseFloat(document.getElementById('total-amount').innerText);
+            if(total <= 0) return;
+            const today = new Date();
+            const dateKey = `${today.getFullYear()}-${today.getMonth()+1}-${today.getDate()}`;
+            
+            // Generate readable time (e.g., 08:30 PM)
+            const timeString = today.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true });
+            
+            const storedHistory = JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]');
+            storedHistory.push({ 
+                dateKey, 
+                time: timeString, 
+                total: total.toFixed(2), 
+                itemList: items.filter(i => i.name && i.price) 
+            });
+            
+            localStorage.setItem(HISTORY_KEY, JSON.stringify(storedHistory));
+            localStorage.removeItem(STORAGE_KEY);
+            items = []; renderItems(); calculateTotal(); loadHistory();
+            alert("Entry Saved with Time: " + timeString);
+        }
+
+        function loadHistory() {
+            const raw = JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]');
+            historyData = {};
+            raw.forEach(entry => {
+                if(!historyData[entry.dateKey]) historyData[entry.dateKey] = [];
+                historyData[entry.dateKey].push(entry);
+            });
+        }
+
+        function renderCalendar() {
+            const grid = document.getElementById('calendar-grid');
+            const label = document.getElementById('month-year-label');
+            const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+            label.innerText = `${monthNames[currentMonth]} ${currentYear}`;
+            Array.from(grid.children).slice(7).forEach(c => c.remove());
+            const firstDay = new Date(currentYear, currentMonth, 1).getDay();
+            const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+            for(let i=0; i<firstDay; i++) grid.appendChild(document.createElement('div'));
+            for(let d=1; d<=daysInMonth; d++) {
+                const dateKey = `${currentYear}-${currentMonth+1}-${d}`;
+                const cell = document.createElement('div');
+                cell.className = 'day-cell' + (historyData[dateKey] ? ' purchase-day' : '');
+                cell.innerText = d;
+                if(historyData[dateKey]) cell.onclick = () => showDayDetails(dateKey);
+                grid.appendChild(cell);
             }
         }
 
-        function calculateTotal() {
-            const priceInputs = document.querySelectorAll('.price-input');
-            let total = 0;
-
-            priceInputs.forEach(input => {
-                const price = parseFloat(input.value) || 0;
-                total += price;
+        function showDayDetails(key) {
+            selectedDateKey = key;
+            const display = document.getElementById('daily-total-display');
+            document.getElementById('clear-date-history-btn').style.display = 'block';
+            let html = `<div style="margin-bottom:10px;"><strong>Date: ${key}</strong></div>`;
+            
+            // Render each entry as a separate card with time
+            historyData[key].forEach(tx => {
+                html += `<div class="history-card">
+                    <div class="history-time">ENTRY TIME: ${tx.time}</div>`;
+                tx.itemList.forEach(it => { 
+                    html += `<div style="display:flex; justify-content:space-between; font-size:0.8em; padding:2px 0;">
+                        <span>${it.name}</span><span>₹${it.price}</span>
+                    </div>`; 
+                });
+                html += `<div style="text-align:right; font-weight:bold; color:green; border-top:1px solid #eee; margin-top:5px; padding-top:3px;">
+                    Entry Total: ₹${tx.total}
+                </div></div>`;
             });
-
-            const formattedTotal = total.toFixed(2);
-            document.getElementById('total-amount').innerText = formattedTotal;
-            return total;
+            display.innerHTML = html;
         }
 
-        document.addEventListener('DOMContentLoaded', () => {
-            renderItems(); 
-            loadAndProcessHistory(); 
-        });
-    </script>
+        function toggleHistory() {
+            const sec = document.getElementById('history-section');
+            sec.style.display = (sec.style.display === 'none') ? 'block' : 'none';
+            if(sec.style.display === 'block') { loadHistory(); renderCalendar(); }
+        }
 
+        function changeMonth(step) {
+            currentMonth += step;
+            if(currentMonth > 11) { currentMonth = 0; currentYear++; }
+            if(currentMonth < 0) { currentMonth = 11; currentYear--; }
+            renderCalendar();
+        }
+
+        function deleteSpecificDateHistory() {
+            if(!selectedDateKey || !confirm("Delete all entries for this date?")) return;
+            let raw = JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]');
+            raw = raw.filter(entry => entry.dateKey !== selectedDateKey);
+            localStorage.setItem(HISTORY_KEY, JSON.stringify(raw));
+            selectedDateKey = null;
+            document.getElementById('daily-total-display').innerText = "History Cleared.";
+            loadHistory(); renderCalendar();
+        }
+
+        function saveCurrentState() { localStorage.setItem(STORAGE_KEY, JSON.stringify(items)); }
+
+        window.onload = () => {
+            const saved = localStorage.getItem(STORAGE_KEY);
+            if(saved) items = JSON.parse(saved);
+            loadHistory(); renderItems(); calculateTotal();
+        };
+    </script>
 </body>
 </html>
