@@ -39,8 +39,8 @@
         .budget-box { background: #f0f0f0; padding: 12px; border-radius: 12px; border-left: 5px solid #666; display: flex; justify-content: space-between; margin-bottom: 20px; color: #333; font-size: 0.9em; }
         .budget-box input { width: 80px; border: 1px solid #ccc; padding: 4px; border-radius: 5px; font-weight: bold; text-align: center; }
 
-        .item-entry { display: flex; gap: 8px; margin-bottom: 10px; }
-        .item-entry input { padding: 10px; border-radius: 8px; border: 1px solid #ddd; font-size: 14px; background: #fff; color: #333; }
+        .item-entry { display: flex; gap: 5px; margin-bottom: 10px; align-items: center; width: 100%; }
+        .item-entry input { padding: 10px; border-radius: 8px; border: 1px solid #ddd; font-size: 14px; background: #fff; color: #333; box-sizing: border-box; }
         
         button { border: none; border-radius: 10px; padding: 12px; font-weight: bold; cursor: pointer; transition: 0.2s; }
         #add-item-btn { width: 100%; background: #eee; color: #333; margin-bottom: 15px; border: 1px dashed #999; }
@@ -49,7 +49,7 @@
         .btn-row button { flex: 1; }
         #save-btn { background: #2e7d32; color: white; }
         #history-toggle-btn { background: #1565c0; color: white; }
-        .delete-btn { background: #ffebee; color: #c62828; }
+        .delete-btn { background: #ffebee; color: #c62828; min-width: 35px; padding: 10px 5px; }
 
         /* CALENDAR & HISTORY */
         #calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; text-align: center; margin-top: 10px; }
@@ -120,6 +120,20 @@
             return audioContext;
         }
 
+        // --- TTS LADY VOICE ALERT ---
+        function speakAlert() {
+            if ('speechSynthesis' in window) {
+                const msg = new SpeechSynthesisUtterance("Alert! You are over budget.");
+                const voices = window.speechSynthesis.getVoices();
+                // Try to find a female voice
+                const femaleVoice = voices.find(voice => voice.name.includes('Female') || voice.name.includes('Google UK English Female') || voice.name.includes('Microsoft Zira'));
+                if (femaleVoice) msg.voice = femaleVoice;
+                msg.pitch = 1.1;
+                msg.rate = 1;
+                window.speechSynthesis.speak(msg);
+            }
+        }
+
         function playBeep(freq, duration, count = 1) {
             const ctx = getAudioContext();
             for (let i = 0; i < count; i++) {
@@ -150,7 +164,8 @@
 
             if (total > budget && budget > 0) {
                 if(!radar.classList.contains('over')) { 
-                    playBeep(600, 0.3, 3); 
+                    playBeep(600, 0.3, 3);
+                    speakAlert(); // Triggers Lady Voice
                 }
                 radar.classList.add('over');
                 display.classList.add('over');
@@ -182,8 +197,8 @@
                 const div = document.createElement('div');
                 div.className = 'item-entry';
                 div.innerHTML = `
-                    <input type="text" placeholder="Item" style="flex:3" value="${item.name}" oninput="updateItem(${item.id}, 'name', this.value)" onkeydown="handleEnter(event, ${index}, 'name')">
-                    <input type="number" class="price-input" placeholder="₹" style="flex:1.5" value="${item.price}" oninput="updateItem(${item.id}, 'price', this.value)" onkeydown="handleEnter(event, ${index}, 'price')">
+                    <input type="text" placeholder="Item" style="flex:2.5" value="${item.name}" oninput="updateItem(${item.id}, 'name', this.value)" onkeydown="handleEnter(event, ${index}, 'name')">
+                    <input type="number" class="price-input" placeholder="₹" style="flex:1.2" value="${item.price}" oninput="updateItem(${item.id}, 'price', this.value)" onkeydown="handleEnter(event, ${index}, 'price')">
                     <button class="delete-btn" onclick="deleteItem(${item.id})">✖</button>`;
                 list.appendChild(div);
             });
@@ -210,10 +225,7 @@
             if(total <= 0) return;
             const today = new Date();
             const dateKey = `${today.getFullYear()}-${today.getMonth()+1}-${today.getDate()}`;
-            
-            // Generate readable time (e.g., 08:30 PM)
             const timeString = today.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true });
-            
             const storedHistory = JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]');
             storedHistory.push({ 
                 dateKey, 
@@ -221,7 +233,6 @@
                 total: total.toFixed(2), 
                 itemList: items.filter(i => i.name && i.price) 
             });
-            
             localStorage.setItem(HISTORY_KEY, JSON.stringify(storedHistory));
             localStorage.removeItem(STORAGE_KEY);
             items = []; renderItems(); calculateTotal(); loadHistory();
@@ -261,8 +272,6 @@
             const display = document.getElementById('daily-total-display');
             document.getElementById('clear-date-history-btn').style.display = 'block';
             let html = `<div style="margin-bottom:10px;"><strong>Date: ${key}</strong></div>`;
-            
-            // Render each entry as a separate card with time
             historyData[key].forEach(tx => {
                 html += `<div class="history-card">
                     <div class="history-time">ENTRY TIME: ${tx.time}</div>`;
@@ -304,6 +313,8 @@
         function saveCurrentState() { localStorage.setItem(STORAGE_KEY, JSON.stringify(items)); }
 
         window.onload = () => {
+            // Load voices early
+            window.speechSynthesis.getVoices();
             const saved = localStorage.getItem(STORAGE_KEY);
             if(saved) items = JSON.parse(saved);
             loadHistory(); renderItems(); calculateTotal();
