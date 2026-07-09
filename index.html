@@ -2,8 +2,9 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LedgerMate V.7 | M.A. Gohar</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>LedgerMate Pro Max 3-in-1 | M.A. Gohar</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
         :root {
             --primary-green: #00ff41;
@@ -12,65 +13,129 @@
             --danger-red: #ff0000;
             --bg-dark: #0d0d0d;
             --glass-white: rgba(255, 255, 255, 0.98);
+            
+            /* स्मार्ट कैलकुलेटर थीम्स */
+            --calc-bg: #e0e5ec;
+            --shadow-light: #ffffff;
+            --shadow-dark: #a3b1c6;
+            --text-color: #44474a;
+            --accent-pink: #ff4d8d;
+            --accent-blue: #6366f1;
         }
 
-        body { font-family: 'Consolas', 'Segoe UI', monospace; background-color: var(--bg-dark); margin: 0; display: flex; flex-direction: column; align-items: center; min-height: 100vh; color: #fff; }
+        /* ग्लोबल रिस्पॉन्सिव बॉक्स मॉडल */
+        * { box-sizing: border-box; }
+
+        body { font-family: 'Consolas', 'Segoe UI', monospace; background-color: var(--bg-dark); margin: 0; display: flex; flex-direction: column; align-items: center; min-height: 100vh; color: #fff; padding-bottom: 20px; }
         
-        #marquee-container { width: 100%; background-color: #000; border-bottom: 1px solid var(--primary-green); padding: 5px 0; color: var(--primary-green); text-shadow: 0 0 5px var(--primary-green); font-weight: bold; }
+        #marquee-container { width: 100%; background-color: #000; border-bottom: 1px solid var(--primary-green); padding: 5px 0; color: var(--primary-green); text-shadow: 0 0 5px var(--primary-green); font-weight: bold; text-align: center; }
 
         /* --- REALISTIC RADAR --- */
-        #radar-section { background-color: var(--radar-bg); width: 100%; display: flex; justify-content: center; padding: 20px 0; border-bottom: 2px solid #222; position: relative; }
-        .radar-container { width: 140px; height: 140px; position: relative; border-radius: 50%; background: radial-gradient(circle, #0a200a 0%, #050a05 100%); border: 3px solid #333; box-shadow: 0 0 20px rgba(0,0,0,0.5); overflow: hidden; }
+        #radar-section { background-color: var(--radar-bg); width: 100%; display: flex; justify-content: center; padding: 15px 0; border-bottom: 2px solid #222; position: relative; }
+        .radar-container { width: 110px; height: 110px; position: relative; border-radius: 50%; background: radial-gradient(circle, #0a200a 0%, #050a05 100%); border: 3px solid #333; box-shadow: 0 0 20px rgba(0,0,0,0.5); overflow: hidden; }
         .radar-container::before { content: ""; position: absolute; top: 0; left: 0; right: 0; bottom: 0; border-radius: 50%; background-image: radial-gradient(circle, transparent 20%, rgba(0, 255, 65, 0.1) 21%, transparent 22%, transparent 40%, rgba(0, 255, 65, 0.1) 41%, transparent 42%); }
         .sweep { width: 50%; height: 50%; background: conic-gradient(from 0deg, var(--primary-green) 0%, transparent 30%); position: absolute; top: 0; left: 50%; transform-origin: bottom left; animation: rotate 4s linear infinite; filter: blur(1px); }
         .radar-container.over { border-color: var(--danger-red); box-shadow: 0 0 30px rgba(255, 0, 0, 0.4); }
         .radar-container.over .sweep { background: conic-gradient(from 0deg, var(--danger-red) 0%, transparent 40%); animation: rotate 1s linear infinite; }
         @keyframes rotate { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
 
-        /* --- APP CONTENT --- */
-        #app-container, #history-section { background: var(--glass-white); color: #333; border-radius: 25px; padding: 20px; width: 92%; max-width: 450px; margin: -15px 0 20px 0; position: relative; z-index: 10; box-shadow: 0 10px 40px rgba(0,0,0,0.5); box-sizing: border-box; }
+        /* --- MODE SWITCHER --- */
+        .mode-switcher-bar { width: 92%; max-width: 450px; display: flex; gap: 5px; margin: 15px 0 0 0; background: #222; padding: 5px; border-radius: 12px; border: 1px solid #444; }
+        .mode-switch-btn { flex: 1; background: transparent; border: none; color: #aaa; padding: 10px 5px; font-size: 0.7rem; font-weight: bold; font-family: inherit; border-radius: 8px; cursor: pointer; transition: 0.2s; display: flex; flex-direction: column; align-items: center; gap: 4px; }
+        .mode-switch-btn.active { background: var(--dark-green); color: var(--primary-green); border: 1px solid var(--primary-green); text-shadow: 0 0 5px var(--primary-green); }
+
+        /* --- PANELS VISIBILITY --- */
+        .main-panel { display: none; background: var(--glass-white); color: #333; border-radius: 25px; padding: 20px; width: 92%; max-width: 450px; margin: 15px 0 20px 0; position: relative; z-index: 10; box-shadow: 0 10px 40px rgba(0,0,0,0.5); }
+        .main-panel.active { display: block; }
         
         /* BRANDING & TOTAL */
         .branding-text { text-align: center; font-size: 0.65em; font-weight: bold; color: #888; margin-bottom: 2px; letter-spacing: 1px; }
-        #total-display { padding: 15px; background: #eef7ee; border: 2px solid var(--primary-green); border-radius: 15px; text-align: center; font-weight: bold; font-size: 1.4em; margin-bottom: 15px; color: var(--dark-green); }
-        #total-display.over { border-color: var(--danger-red); background: #fff5f5; color: var(--danger-red); }
+        #total-display, .pulse-display-head { padding: 15px; background: #eef7ee; border: 2px solid var(--primary-green); border-radius: 15px; text-align: center; font-weight: bold; font-size: 1.4em; margin-bottom: 15px; color: var(--dark-green); width: 100%; }
+        #total-display.over, .pulse-display-head.over { border-color: var(--danger-red); background: #fff5f5; color: var(--danger-red); }
         .diff-amount { font-size: 0.5em; display: block; color: var(--danger-red); }
 
-        .budget-box { background: #f0f0f0; padding: 12px; border-radius: 12px; border-left: 5px solid #666; display: flex; justify-content: space-between; margin-bottom: 20px; color: #333; font-size: 0.9em; }
-        .budget-box input { width: 80px; border: 1px solid #ccc; padding: 4px; border-radius: 5px; font-weight: bold; text-align: center; }
+        .budget-box { background: #f0f0f0; padding: 12px; border-radius: 12px; border-left: 5px solid #666; display: flex; justify-content: space-between; margin-bottom: 15px; color: #333; font-size: 0.9em; align-items: center; width: 100%; }
+        .budget-box input { width: 90px; border: 1px solid #ccc; padding: 5px; border-radius: 5px; font-weight: bold; text-align: center; font-family: inherit; }
 
         .item-entry { display: flex; gap: 5px; margin-bottom: 10px; align-items: center; width: 100%; }
-        .item-entry input { padding: 10px; border-radius: 8px; border: 1px solid #ddd; font-size: 14px; background: #fff; color: #333; box-sizing: border-box; }
+        .item-entry input, .form-section input, .form-section select { padding: 10px; border-radius: 8px; border: 1px solid #ddd; font-size: 14px; background: #fff; color: #333; font-family: inherit; width: 100%; min-width: 0; }
         
-        button { border: none; border-radius: 10px; padding: 12px; font-weight: bold; cursor: pointer; transition: 0.2s; }
+        button { border: none; border-radius: 10px; padding: 12px; font-weight: bold; cursor: pointer; transition: 0.2s; font-family: inherit; }
         #add-item-btn { width: 100%; background: #eee; color: #333; margin-bottom: 15px; border: 1px dashed #999; }
         
-        .btn-row { display: flex; gap: 10px; }
+        .btn-row { display: flex; gap: 10px; width: 100%; }
         .btn-row button { flex: 1; }
-        #save-btn { background: #2e7d32; color: white; }
+        #save-btn, .execute-btn { background: #2e7d32; color: white; width: 100%; }
         #history-toggle-btn { background: #1565c0; color: white; }
-        .delete-btn { background: #ffebee; color: #c62828; min-width: 35px; padding: 10px 5px; }
+        .delete-btn { background: #ffebee; color: #c62828; min-width: 35px; padding: 10px 5px; border-radius: 8px; flex-shrink: 0; }
 
-        /* CALENDAR & HISTORY */
-        #calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; text-align: center; margin-top: 10px; }
-        .day-cell { padding: 8px 0; border-radius: 5px; font-size: 0.85em; border: 1px solid #eee; }
-        .purchase-day { background: var(--primary-green); color: white; cursor: pointer; font-weight: bold; }
-        .history-card { border: 1px solid #ddd; padding: 10px; margin-top: 10px; border-radius: 12px; background: #fff; position: relative; }
+        /* --- RATEPULSE SPECIFIC FLEXBOX LAYOUT --- */
+        .form-section { background: #f9f9f9; padding: 12px; border: 1px solid #e0e0e0; border-radius: 15px; margin-bottom: 15px; width: 100%; }
+        .row { display: flex; gap: 8px; margin-bottom: 8px; width: 100%; }
+        .row > div { display: flex; flex-direction: column; min-width: 0; }
+        
+        .col-2 { flex: 2; }
+        .col-1 { flex: 1; }
+        .col-1-5 { flex: 1.5; }
+
+        .form-section label { font-size: 0.65rem; font-weight: bold; color: var(--dark-green); margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .mode-selector { display: flex; gap: 4px; margin-bottom: 10px; background: #e0e0e0; padding: 3px; border-radius: 8px; width: 100%; }
+        .mode-btn { flex: 1; border: none; padding: 6px; font-size: 0.65rem; font-weight: bold; cursor: pointer; border-radius: 6px; background: transparent; color: #666; }
+        .mode-btn.active { background: var(--dark-green); color: var(--primary-green); }
+        
+        .calc-preview { background: #e3f2fd; color: #1565c0; padding: 10px; border-radius: 8px; font-size: 0.75rem; font-weight: bold; margin-bottom: 10px; text-align: center; border: 1px solid #bbdefb; width: 100%; }
+        
+        .pulse-history-table { width: 100%; border-collapse: collapse; font-size: 0.75rem; margin-top: 10px; background: white; border-radius: 8px; overflow: hidden; }
+        .pulse-history-table td { padding: 8px 6px; border-bottom: 1px solid #f1f1f1; color: #333; }
+        .std-rate-tag { font-size: 0.65rem; color: #2e7d32; font-weight: bold; display: block; }
+        .time-tag { font-size: 0.6rem; color: #999; }
+
+        /* --- MERGED NEW SMART CALCULATOR STYLES --- */
+        .phone-frame-container { background: var(--calc-bg); border-radius: 25px; padding: 15px; display: flex; flex-direction: column; width: 100%; box-shadow: inset 3px 3px 10px var(--shadow-dark), inset -3px -3px 10px var(--shadow-light); }
+        .top-display { background: var(--calc-bg); border-radius: 20px; padding: 15px; box-shadow: inset 5px 5px 10px var(--shadow-dark), inset -5px -5px 10px var(--shadow-light); display: flex; flex-direction: column; justify-content: flex-end; align-items: flex-end; margin-bottom: 15px; min-height: 90px; }
+        #current-operation { color: #888; font-size: 0.95rem; font-weight: 600; text-align: right; width: 100%; word-wrap: break-word; min-height: 1.2rem; }
+        .result-row { width: 100%; display: flex; justify-content: space-between; align-items: center; }
+        .eq-sign { color: #aaa; font-size: 1.2rem; font-weight: bold; }
+        #result { color: var(--text-color); font-size: 2.2rem; font-weight: 800; word-break: break-all; text-align: right; }
+        .white-body-section { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; width: 100%; }
+        
+        .calc-custom-btn { background: var(--calc-bg); border: none; border-radius: 12px; color: var(--text-color); padding: 14px 5px; font-size: 1.05rem; font-weight: 700; cursor: pointer; display: flex; justify-content: center; align-items: center; box-shadow: 4px 4px 8px var(--shadow-dark), -4px -4px 8px var(--shadow-light); transition: 0.1s all ease; user-select: none; -webkit-tap-highlight-color: transparent; font-family: inherit; }
+        .calc-custom-btn:active { box-shadow: inset 2px 2px 5px var(--shadow-dark), inset -2px -2px 5px var(--shadow-light); transform: scale(0.95); }
+        .calc-custom-btn.pink { color: var(--accent-pink); }
+        .calc-custom-btn.smart { font-size: 0.65rem; color: var(--accent-blue); letter-spacing: 0; padding: 12px 2px; }
+        .calc-custom-btn.equal { background: var(--accent-pink); color: white; box-shadow: 4px 4px 10px rgba(255, 77, 141, 0.3); }
+
+        /* HISTORY CALENDAR */
+        #calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; text-align: center; margin-top: 10px; width: 100%; }
+        .day-cell { padding: 8px 0; border-radius: 5px; font-size: 0.85em; border: 1px solid #eee; color: #333;}
+        .purchase-day { background: #2e7d32; color: white; cursor: pointer; font-weight: bold; }
+        .history-card { border: 1px solid #ddd; padding: 10px; margin-top: 10px; border-radius: 12px; background: #fff; width: 100%; }
         .history-time { font-size: 0.7em; color: #1565c0; font-weight: bold; margin-bottom: 5px; border-bottom: 1px solid #eee; padding-bottom: 2px; }
     </style>
 </head>
 <body>
 
     <div id="marquee-container">
-        <marquee>Smart Shopping List V2.3 Powered By M.A. GOHAR</marquee>
+        <marquee scrollamount="4">Smart Shopping Hub 3-in-1 V7.5 Powered By M.A. GOHAR</marquee>
     </div>
 
     <div id="radar-section">
         <div class="radar-container" id="radarCont"><div class="sweep"></div></div>
     </div>
 
-    <div id="app-container">
-        <!-- TOTAL DISPLAY WITH BRANDING -->
+    <div class="mode-switcher-bar">
+        <button class="mode-switch-btn active" id="nav-simple" onclick="switchAppMode('simple')">
+            <i class="fas fa-list-ol"></i> SIMPLE LIST
+        </button>
+        <button class="mode-switch-btn" id="nav-advance" onclick="switchAppMode('advance')">
+            <i class="fas fa-chart-line"></i> RATEPULSE
+        </button>
+        <button class="mode-switch-btn" id="nav-calc" onclick="switchAppMode('calc')">
+            <i class="fas fa-calculator"></i> CALCULATOR
+        </button>
+    </div>
+
+    <div id="panel-simple" class="main-panel active">
         <div class="branding-text">POWERED BY M.A. GOHAR</div>
         <div id="total-display">
             TOTAL: ₹ <span id="total-amount">0.00</span>
@@ -91,8 +156,97 @@
         </div>
     </div>
 
-    <div id="history-section" style="display:none;">
-        <h2 style="color:#333; font-size:1.1em; text-align:center;">History Calendar</h2>
+    <div id="panel-advance" class="main-panel">
+        <div class="branding-text">RATEPULSE ADVANCED TRACKER</div>
+        
+        <div class="pulse-display-head" id="pulse-head">
+            DAY TOTAL: ₹ <span id="pulse-day-total">0.00</span>
+            <span id="pulse-budget-diff" class="diff-amount"></span>
+        </div>
+
+        <div class="form-section">
+            <div class="row">
+                <div class="col-2"><label>SELECT DATE</label><input type="date" id="pulse-date" onchange="renderPulseHistory()"></div>
+                <div class="col-1-5"><label>DAILY LIMIT (₹)</label><input type="number" id="pulse-budget" value="1000" oninput="runPulseLogic()"></div>
+            </div>
+
+            <div class="mode-selector">
+                <button class="mode-btn active" id="mode-price" onclick="setPulseMode('price')">REVERSE (PRICE)</button>
+                <button class="mode-btn" id="mode-rate" onclick="setPulseMode('rate')">FORWARD (RATE)</button>
+            </div>
+
+            <div class="row">
+                <div class="col-2"><label>ITEM NAME</label><input type="text" id="pulse-item-name" placeholder="E.g. Sugar"></div>
+                <div class="col-1"><label>QTY</label><input type="number" id="pulse-qty" placeholder="0" oninput="runPulseLogic()"></div>
+                <div class="col-1"><label>UNIT</label>
+                    <select id="pulse-unit" onchange="runPulseLogic()">
+                        <option value="pcs">PCS</option><option value="gm">GM</option><option value="kg">KG</option>
+                        <option value="ml">ML</option><option value="ltr">LTR</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-2"><label id="pulse-input-label">TOTAL PRICE (₹)</label><input type="number" id="pulse-main-input" placeholder="0.00" oninput="runPulseLogic()"></div>
+                <div class="col-1"><label>GST%</label><input type="number" id="pulse-gst" value="0" oninput="runPulseLogic()"></div>
+                <div class="col-1"><label>DISC%</label><input type="number" id="pulse-disc" value="0" oninput="runPulseLogic()"></div>
+            </div>
+
+            <div id="pulse-preview-box" class="calc-preview">READY</div>
+            <button class="execute-btn" onclick="savePulseEntry()"><i class="fas fa-plus-circle"></i> EXECUTE ENTRY</button>
+        </div>
+
+        <div id="pulse-history-container"></div>
+    </div>
+
+    <div id="panel-calc" class="main-panel" style="padding: 12px; background: var(--calc-bg);">
+        <div class="phone-frame-container">
+            <div class="branding-text" style="margin-bottom: 8px;">POWERED BY M.A. GOHAR V.01</div>
+            
+            <div class="top-display">
+                <div id="current-operation"></div> 
+                <div class="result-row">
+                    <span class="eq-sign">=</span>
+                    <div id="result">0</div>
+                </div>
+            </div>
+
+            <div class="white-body-section">
+                <button class="calc-custom-btn smart" onclick="calculateZakat()">ZAKAT</button>
+                <button class="calc-custom-btn smart" onclick="handleGST('A')">GST (A)</button>
+                <button class="calc-custom-btn smart" onclick="handleGST('R')">GST (R)</button>
+                <button class="calc-custom-btn smart" onclick="applyDiscount()">DISC</button>
+
+                <button class="calc-custom-btn pink" onclick="clearAll()">AC</button>
+                <button class="calc-custom-btn" onclick="chooseOperation('/')">/</button>
+                <button class="calc-custom-btn" onclick="chooseOperation('*')">×</button>
+                <button class="calc-custom-btn pink" onclick="deleteLast()">⌫</button>
+
+                <button class="calc-custom-btn" onclick="appendNumber('7')">7</button>
+                <button class="calc-custom-btn" onclick="appendNumber('8')">8</button>
+                <button class="calc-custom-btn" onclick="appendNumber('9')">9</button>
+                <button class="calc-custom-btn pink" onclick="applyPercentage()">%</button>
+
+                <button class="calc-custom-btn" onclick="appendNumber('4')">4</button>
+                <button class="calc-custom-btn" onclick="appendNumber('5')">5</button>
+                <button class="calc-custom-btn" onclick="appendNumber('6')">6</button>
+                <button class="calc-custom-btn pink" onclick="chooseOperation('-')">-</button>
+
+                <button class="calc-custom-btn" onclick="appendNumber('1')">1</button>
+                <button class="calc-custom-btn" onclick="appendNumber('2')">2</button>
+                <button class="calc-custom-btn" onclick="appendNumber('3')">3</button>
+                <button class="calc-custom-btn pink" onclick="chooseOperation('+')">+</button>
+
+                <button class="calc-custom-btn smart" onclick="showHistory()">HIST</button>
+                <button class="calc-custom-btn" onclick="appendNumber('0')">0</button>
+                <button class="calc-custom-btn" onclick="appendNumber('.')">.</button>
+                <button class="calc-custom-btn equal" onclick="calculateFinal()">=</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="history-section" class="main-panel" style="display:none; margin-top:0;">
+        <h2 style="color:#333; font-size:1.1em; text-align:center; margin:0 0 10px 0;">History Calendar</h2>
         <div style="display:flex; justify-content: space-between; align-items:center; margin-bottom:10px;">
             <button onclick="changeMonth(-1)">◀</button>
             <span id="month-year-label" style="font-weight:bold; color:#333;"></span>
@@ -108,28 +262,36 @@
     <script>
         const STORAGE_KEY = 'ledgerMate_Current';
         const HISTORY_KEY = 'ledgerMate_History';
+        const PULSE_DB_KEY = 'ratePulse_Lifetime_DB';
+
         let items = [];
         let historyData = {};
+        let pulseDB = JSON.parse(localStorage.getItem(PULSE_DB_KEY)) || {};
+        
         let currentMonth = new Date().getMonth();
         let currentYear = new Date().getFullYear();
         let selectedDateKey = null;
         let audioContext = null;
+        let pulseMode = 'price';
+
+        // कैलकुलेटर स्टेट्स
+        let expression = '';
+        let resEl, opsEl;
+
+        document.getElementById('pulse-date').value = new Date().toISOString().slice(0,10);
 
         function getAudioContext() {
             if (!audioContext) audioContext = new (window.AudioContext || window.webkitAudioContext)();
             return audioContext;
         }
 
-        // --- TTS LADY VOICE ALERT ---
         function speakAlert() {
             if ('speechSynthesis' in window) {
                 const msg = new SpeechSynthesisUtterance("Alert! You are over budget.");
                 const voices = window.speechSynthesis.getVoices();
-                // Try to find a female voice
-                const femaleVoice = voices.find(voice => voice.name.includes('Female') || voice.name.includes('Google UK English Female') || voice.name.includes('Microsoft Zira'));
+                const femaleVoice = voices.find(v => v.name.includes('Female') || v.name.includes('Google UK English Female') || v.name.includes('Microsoft Zira'));
                 if (femaleVoice) msg.voice = femaleVoice;
-                msg.pitch = 1.1;
-                msg.rate = 1;
+                msg.pitch = 1.1; msg.rate = 1;
                 window.speechSynthesis.speak(msg);
             }
         }
@@ -151,7 +313,51 @@
             }
         }
 
+        // नया कैलकुलेटर सॉफ्ट क्लिक साउंड
+        function playSoftClick() {
+            const ctx = getAudioContext();
+            if (!ctx) return;
+            try {
+                if (ctx.state === 'suspended') ctx.resume();
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(1000, ctx.currentTime);
+                gain.gain.setValueAtTime(0.02, ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.04);
+                osc.connect(gain); gain.connect(ctx.destination);
+                osc.start(); osc.stop(ctx.currentTime + 0.04);
+            } catch (e) {}
+        }
+
+        function switchAppMode(mode) {
+            document.querySelectorAll('.main-panel').forEach(p => p.classList.remove('active'));
+            document.querySelectorAll('.mode-switch-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById('history-section').style.display = 'none';
+
+            if(mode === 'simple') {
+                document.getElementById('panel-simple').classList.add('active');
+                document.getElementById('nav-simple').classList.add('active');
+                calculateTotal();
+            } else if (mode === 'advance') {
+                document.getElementById('panel-advance').classList.add('active');
+                document.getElementById('nav-advance').classList.add('active');
+                renderPulseHistory();
+            } else if (mode === 'calc') {
+                document.getElementById('panel-calc').classList.add('active');
+                document.getElementById('nav-calc').classList.add('active');
+                resetRadarToNormal();
+            }
+            playBeep(1000, 0.05);
+        }
+
+        function resetRadarToNormal() {
+            document.getElementById('radarCont').classList.remove('over');
+        }
+
+        // ================= 1. SIMPLE BUDGET LIST CODE =================
         function calculateTotal() {
+            if (!document.getElementById('panel-simple').classList.contains('active')) return;
             const priceInputs = document.querySelectorAll('.price-input');
             const budget = parseFloat(document.getElementById('userBudget').value) || 0;
             let total = 0;
@@ -165,7 +371,7 @@
             if (total > budget && budget > 0) {
                 if(!radar.classList.contains('over')) { 
                     playBeep(600, 0.3, 3);
-                    speakAlert(); // Triggers Lady Voice
+                    speakAlert();
                 }
                 radar.classList.add('over');
                 display.classList.add('over');
@@ -197,8 +403,8 @@
                 const div = document.createElement('div');
                 div.className = 'item-entry';
                 div.innerHTML = `
-                    <input type="text" placeholder="Item" style="flex:2.5" value="${item.name}" oninput="updateItem(${item.id}, 'name', this.value)" onkeydown="handleEnter(event, ${index}, 'name')">
-                    <input type="number" class="price-input" placeholder="₹" style="flex:1.2" value="${item.price}" oninput="updateItem(${item.id}, 'price', this.value)" onkeydown="handleEnter(event, ${index}, 'price')">
+                    <input type="text" placeholder="Item Name" style="flex:2.5" value="${item.name}" oninput="updateItem(${item.id}, 'name', this.value)" onkeydown="handleEnter(event, ${index}, 'name')">
+                    <input type="number" class="price-input" placeholder="₹ Price" style="flex:1.2" value="${item.price}" oninput="updateItem(${item.id}, 'price', this.value)" onkeydown="handleEnter(event, ${index}, 'price')">
                     <button class="delete-btn" onclick="deleteItem(${item.id})">✖</button>`;
                 list.appendChild(div);
             });
@@ -239,6 +445,259 @@
             alert("Entry Saved with Time: " + timeString);
         }
 
+        // ================= 2. ADVANCE RATEPULSE CODE =================
+        function setPulseMode(m) {
+            pulseMode = m;
+            document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById('mode-' + m).classList.add('active');
+            document.getElementById('pulse-input-label').innerText = m === 'price' ? "TOTAL PRICE (₹)" : "RATE PER UNIT (₹)";
+            document.getElementById('pulse-main-input').value = '';
+            document.getElementById('pulse-preview-box').innerText = 'READY';
+            runPulseLogic();
+        }
+
+        function runPulseLogic() {
+            if (!document.getElementById('panel-advance').classList.contains('active')) return;
+            const qty = parseFloat(document.getElementById('pulse-qty').value) || 0;
+            const unit = document.getElementById('pulse-unit').value;
+            const inputVal = parseFloat(document.getElementById('pulse-main-input').value) || 0;
+            const gst = parseFloat(document.getElementById('pulse-gst').value) || 0;
+            const disc = parseFloat(document.getElementById('pulse-disc').value) || 0;
+            const budget = parseFloat(document.getElementById('pulse-budget').value) || 0;
+            const date = document.getElementById('pulse-date').value;
+
+            let dayTotal = pulseDB[date] ? pulseDB[date].reduce((sum, item) => sum + item.price, 0) : 0;
+            let finalPrice = 0, finalRate = 0;
+
+            if (qty <= 0 || inputVal <= 0) {
+                document.getElementById('pulse-preview-box').innerText = 'READY';
+            } else {
+                if (pulseMode === 'price') {
+                    finalPrice = inputVal;
+                    let base = inputVal / (1 + (gst/100)) / (1 - (disc/100));
+                    finalRate = (unit === 'gm' || unit === 'ml') ? (base / qty) * 1000 : base / qty;
+                } else {
+                    let pAfter = inputVal * (1 - (disc/100)) * (1 + (gst/100));
+                    finalRate = inputVal;
+                    finalPrice = (unit === 'gm' || unit === 'ml') ? (pAfter / 1000) * qty : pAfter * qty;
+                }
+                document.getElementById('pulse-preview-box').innerText = `FINAL: ₹${finalPrice.toFixed(2)} | RATE: ₹${finalRate.toFixed(1)}`;
+            }
+
+            let projectedTotal = dayTotal + finalPrice;
+            const radar = document.getElementById('radarCont');
+            const display = document.getElementById('pulse-head');
+            const diffSpan = document.getElementById('pulse-budget-diff');
+
+            document.getElementById('pulse-day-total').innerText = dayTotal.toFixed(2);
+
+            if (budget > 0 && projectedTotal > budget) {
+                if(!radar.classList.contains('over')) {
+                    playBeep(600, 0.3, 3);
+                    speakAlert();
+                }
+                radar.classList.add('over');
+                display.classList.add('over');
+                diffSpan.innerText = `ALERT: -₹${(projectedTotal - budget).toFixed(2)}`;
+            } else {
+                radar.classList.remove('over');
+                display.classList.remove('over');
+                diffSpan.innerText = "";
+            }
+
+            return { finalPrice, finalRate };
+        }
+
+        function calculateStandardRate(price, qty, unit) {
+            if (!qty || qty <= 0) return '';
+            let stdPrice = 0, targetUnit = '';
+            if (unit === 'gm' || unit === 'kg') { stdPrice = (unit === 'gm') ? (price / qty) * 1000 : price / qty; targetUnit = 'KG'; }
+            else if (unit === 'ml' || unit === 'ltr') { stdPrice = (unit === 'ml') ? (price / qty) * 1000 : price / qty; targetUnit = 'LTR'; }
+            else { stdPrice = price / qty; targetUnit = 'PCS'; }
+            return `[Rate: ₹${stdPrice.toFixed(1)} / ${targetUnit}]`;
+        }
+
+        function savePulseEntry() {
+            const name = document.getElementById('pulse-item-name').value;
+            const qtyVal = document.getElementById('pulse-qty').value;
+            const unitVal = document.getElementById('pulse-unit').value;
+            const calc = runPulseLogic();
+
+            if (!name || calc.finalPrice <= 0) { alert("Invalid Entry Parameters!"); return; }
+            const date = document.getElementById('pulse-date').value;
+            if (!pulseDB[date]) pulseDB[date] = [];
+
+            pulseDB[date].unshift({
+                name, qty: qtyVal, unit: unitVal,
+                price: calc.finalPrice, rate: calc.finalRate,
+                time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true })
+            });
+
+            localStorage.setItem(PULSE_DB_KEY, JSON.stringify(pulseDB));
+            playBeep(1200, 0.1, 2);
+
+            document.getElementById('pulse-item-name').value = '';
+            document.getElementById('pulse-qty').value = '';
+            document.getElementById('pulse-main-input').value = '';
+            document.getElementById('pulse-item-name').focus();
+
+            renderPulseHistory();
+        }
+
+        function renderPulseHistory() {
+            const date = document.getElementById('pulse-date').value;
+            const container = document.getElementById('pulse-history-container');
+            runPulseLogic();
+
+            if (pulseDB[date] && pulseDB[date].length > 0) {
+                let rows = pulseDB[date].map((item, i) => {
+                    let stdRate = calculateStandardRate(item.price, parseFloat(item.qty), item.unit);
+                    return `
+                        <tr>
+                            <td>
+                                <b>${item.name}</b> <span class="time-tag">(${item.time})</span>
+                                <span class="std-rate-tag">${stdRate}</span>
+                            </td>
+                            <td>${item.qty} ${item.unit.toUpperCase()}</td>
+                            <td style="font-weight:bold;">₹${item.price.toFixed(1)}</td>
+                            <td align="right"><button class="delete-btn" style="padding:4px 8px; font-size:0.75rem;" onclick="deletePulseItem('${date}', ${i})">✖</button></td>
+                        </tr>`;
+                }).join('');
+                container.innerHTML = `<table class="pulse-history-table">${rows}</table>`;
+            } else {
+                container.innerHTML = `<div style="text-align:center; padding:15px; font-size:0.75rem; color:#666;">No history entries for this date.</div>`;
+            }
+        }
+
+        window.deletePulseItem = (date, idx) => {
+            if(confirm("Remove this entry?")) {
+                pulseDB[date].splice(idx, 1);
+                localStorage.setItem(PULSE_DB_KEY, JSON.stringify(pulseDB));
+                renderPulseHistory();
+            }
+        };
+
+        // ================= 3. NEW FIXED RUBBER SMART CALCULATOR CORE MERGED LOGIC =================
+        function autoCalculate() {
+            if (!expression) { resEl.innerText = '0'; return; }
+            try {
+                const lastChar = expression.slice(-1);
+                if (!['+', '-', '*', '/'].includes(lastChar)) {
+                    let result = eval(expression);
+                    resEl.innerText = Number.isFinite(result) ? (Number.isInteger(result) ? result : result.toFixed(2)) : "Error";
+                }
+            } catch (e) {}
+        }
+
+        function updateDisplay() {
+            opsEl.innerText = expression || '';
+            autoCalculate();
+            resEl.style.fontSize = resEl.innerText.length > 9 ? '1.4rem' : '2.2rem';
+        }
+
+        function appendNumber(n) { playSoftClick(); expression += n; updateDisplay(); }
+
+        function chooseOperation(op) {
+            playSoftClick();
+            if (!expression && op === '-') { expression = '-'; updateDisplay(); return; }
+            if (!expression) return;
+            const lastChar = expression.slice(-1);
+            if (['+', '-', '*', '/'].includes(lastChar)) {
+                expression = expression.slice(0, -1) + op;
+            } else {
+                expression += op;
+            }
+            updateDisplay();
+        }
+
+        function calculateFinal() {
+            playSoftClick();
+            if (!expression) return;
+            try {
+                let result = eval(expression);
+                result = Number.isInteger(result) ? result : result.toFixed(2);
+                saveToHistory(`${expression} = ${result}`);
+                expression = result.toString();
+                updateDisplay();
+            } catch (e) {
+                clearAll();
+                resEl.innerText = "Error";
+            }
+        }
+
+        function clearAll() { playSoftClick(); expression = ''; resEl.innerText = '0'; updateDisplay(); }
+        function deleteLast() { playSoftClick(); expression = expression.slice(0, -1); updateDisplay(); }
+
+        function saveToHistory(entry) {
+            try {
+                let history = JSON.parse(localStorage.getItem('calcHistory') || '[]');
+                history.unshift(`[${new Date().toLocaleTimeString('en-GB', {hour12:false})}] ${entry}`);
+                localStorage.setItem('calcHistory', JSON.stringify(history.slice(0, 20)));
+            } catch(e) {}
+        }
+
+        function showHistory() {
+            playSoftClick();
+            let history = JSON.parse(localStorage.getItem('calcHistory') || '[]');
+            if (history.length === 0) { alert("History Khali Hai."); return; }
+            let msg = "HISTORY:\n\n" + history.join('\n') + "\n\nOK: Close | Cancel: Clear History";
+            if (!confirm(msg)) {
+                localStorage.removeItem('calcHistory');
+                alert("History Cleared!");
+            }
+        }
+
+        function applyPercentage() {
+            playSoftClick();
+            if (!expression) return;
+            try { 
+                let res = eval(expression) / 100;
+                expression = res.toString();
+                updateDisplay();
+            } catch(e) {}
+        }
+
+        function calculateZakat() {
+            playSoftClick();
+            if (!expression) return;
+            try { 
+                let val = eval(expression);
+                let res = (val * 0.025).toFixed(2);
+                saveToHistory(`Zakat on ${val} = ${res}`);
+                expression = res;
+                updateDisplay();
+            } catch(e) {}
+        }
+
+        function applyDiscount() {
+            playSoftClick();
+            let d = prompt("Discount %?");
+            if (d && expression) {
+                try { 
+                    let val = eval(expression);
+                    let res = (val * (1 - d/100)).toFixed(2);
+                    saveToHistory(`${val} - ${d}% Disc = ${res}`);
+                    expression = res;
+                    updateDisplay();
+                } catch(e) {}
+            }
+        }
+
+        function handleGST(type) {
+            playSoftClick();
+            let r = prompt("GST %?");
+            if (r && expression) {
+                try { 
+                    let val = eval(expression);
+                    let res = type === 'A' ? (val*(1+r/100)).toFixed(2) : (val/(1+r/100)).toFixed(2);
+                    saveToHistory(`GST ${type} ${r}% = ${res}`);
+                    expression = res;
+                    updateDisplay();
+                } catch(e) {}
+            }
+        }
+
+        // ================= SYSTEM COMMON HISTORY CALENDAR =================
         function loadHistory() {
             const raw = JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]');
             historyData = {};
@@ -271,17 +730,17 @@
             selectedDateKey = key;
             const display = document.getElementById('daily-total-display');
             document.getElementById('clear-date-history-btn').style.display = 'block';
-            let html = `<div style="margin-bottom:10px;"><strong>Date: ${key}</strong></div>`;
+            let html = `<div style="margin-bottom:10px; color:#333;"><strong>Date: ${key}</strong></div>`;
             historyData[key].forEach(tx => {
                 html += `<div class="history-card">
                     <div class="history-time">ENTRY TIME: ${tx.time}</div>`;
                 tx.itemList.forEach(it => { 
-                    html += `<div style="display:flex; justify-content:space-between; font-size:0.8em; padding:2px 0;">
+                    html += `<div style="display:flex; justify-content:space-between; font-size:0.8em; padding:2px 0; color:#333;">
                         <span>${it.name}</span><span>₹${it.price}</span>
                     </div>`; 
                 });
                 html += `<div style="text-align:right; font-weight:bold; color:green; border-top:1px solid #eee; margin-top:5px; padding-top:3px;">
-                    Entry Total: ₹${tx.total}
+                    Total: ₹${tx.total}
                 </div></div>`;
             });
             display.innerHTML = html;
@@ -313,10 +772,14 @@
         function saveCurrentState() { localStorage.setItem(STORAGE_KEY, JSON.stringify(items)); }
 
         window.onload = () => {
-            // Load voices early
             window.speechSynthesis.getVoices();
             const saved = localStorage.getItem(STORAGE_KEY);
             if(saved) items = JSON.parse(saved);
+            
+            // नए कैलकुलेटर एलिमेंट्स बाइंडिंग
+            resEl = document.getElementById('result');
+            opsEl = document.getElementById('current-operation');
+
             loadHistory(); renderItems(); calculateTotal();
         };
     </script>
