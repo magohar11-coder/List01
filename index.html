@@ -41,11 +41,11 @@
 
         /* --- MODE SWITCHER --- */
         .mode-switcher-bar { width: 92%; max-width: 450px; display: flex; gap: 5px; margin: 15px 0 0 0; background: #222; padding: 5px; border-radius: 12px; border: 1px solid #444; }
-        .mode-switch-btn { flex: 1; background: transparent; border: none; color: #aaa; padding: 10px 5px; font-size: 0.7rem; font-weight: bold; font-family: inherit; border-radius: 8px; cursor: pointer; transition: 0.2s; display: flex; flex-direction: column; align-items: center; gap: 4px; }
+        .mode-switch-btn { flex: 1; background: transparent; border: none; color: #aaa; padding: 10px 5px; font-size: 0.7rem; font-weight: bold; font-family: inherit; border-radius: 8px; cursor: pointer; transition: 0.2s; display: flex; flex-direction: column; align-items: center; gap: 4px; -webkit-tap-highlight-color: transparent; }
         .mode-switch-btn.active { background: var(--dark-green); color: var(--primary-green); border: 1px solid var(--primary-green); text-shadow: 0 0 5px var(--primary-green); }
 
         /* --- PANELS VISIBILITY --- */
-        .main-panel { display: none; background: var(--glass-white); color: #333; border-radius: 25px; padding: 20px; width: 92%; max-width: 450px; margin: 15px 0 20px 0; position: relative; z-index: 10; box-shadow: 0 10px 40px rgba(0,0,0,0.5); }
+        .main-panel { display: none; background: var(--glass-white); color: #333; border-radius: 25px; padding: 20px; width: 92%; max-width: 450px; margin: 15px 0 20px 0; position: relative; z-index: 5; box-shadow: 0 10px 40px rgba(0,0,0,0.5); }
         .main-panel.active { display: block; }
         
         /* BRANDING & TOTAL */
@@ -60,7 +60,7 @@
         .item-entry { display: flex; gap: 5px; margin-bottom: 10px; align-items: center; width: 100%; }
         .item-entry input, .form-section input, .form-section select { padding: 10px; border-radius: 8px; border: 1px solid #ddd; font-size: 14px; background: #fff; color: #333; font-family: inherit; width: 100%; min-width: 0; }
         
-        button { border: none; border-radius: 10px; padding: 12px; font-weight: bold; cursor: pointer; transition: 0.2s; font-family: inherit; }
+        button { border: none; border-radius: 10px; padding: 12px; font-weight: bold; cursor: pointer; transition: 0.2s; font-family: inherit; -webkit-tap-highlight-color: transparent; }
         #add-item-btn { width: 100%; background: #eee; color: #333; margin-bottom: 15px; border: 1px dashed #999; }
         
         .btn-row { display: flex; gap: 10px; width: 100%; }
@@ -91,15 +91,15 @@
         .time-tag { font-size: 0.6rem; color: #999; }
 
         /* --- MERGED NEW SMART CALCULATOR STYLES --- */
-        .phone-frame-container { background: var(--calc-bg); border-radius: 25px; padding: 15px; display: flex; flex-direction: column; width: 100%; box-shadow: inset 3px 3px 10px var(--shadow-dark), inset -3px -3px 10px var(--shadow-light); }
+        .phone-frame-container { background: var(--calc-bg); border-radius: 25px; padding: 15px; display: flex; flex-direction: column; width: 100%; pointer-events: auto; }
         .top-display { background: var(--calc-bg); border-radius: 20px; padding: 15px; box-shadow: inset 5px 5px 10px var(--shadow-dark), inset -5px -5px 10px var(--shadow-light); display: flex; flex-direction: column; justify-content: flex-end; align-items: flex-end; margin-bottom: 15px; min-height: 90px; }
         #current-operation { color: #888; font-size: 0.95rem; font-weight: 600; text-align: right; width: 100%; word-wrap: break-word; min-height: 1.2rem; }
         .result-row { width: 100%; display: flex; justify-content: space-between; align-items: center; }
         .eq-sign { color: #aaa; font-size: 1.2rem; font-weight: bold; }
         #result { color: var(--text-color); font-size: 2.2rem; font-weight: 800; word-break: break-all; text-align: right; }
-        .white-body-section { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; width: 100%; }
+        .white-body-section { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; width: 100%; pointer-events: auto; }
         
-        .calc-custom-btn { background: var(--calc-bg); border: none; border-radius: 12px; color: var(--text-color); padding: 14px 5px; font-size: 1.05rem; font-weight: 700; cursor: pointer; display: flex; justify-content: center; align-items: center; box-shadow: 4px 4px 8px var(--shadow-dark), -4px -4px 8px var(--shadow-light); transition: 0.1s all ease; user-select: none; -webkit-tap-highlight-color: transparent; font-family: inherit; }
+        .calc-custom-btn { background: var(--calc-bg); border: none; border-radius: 12px; color: var(--text-color); padding: 14px 5px; font-size: 1.05rem; font-weight: 700; cursor: pointer; display: flex; justify-content: center; align-items: center; box-shadow: 4px 4px 8px var(--shadow-dark), -4px -4px 8px var(--shadow-light); transition: 0.1s all ease; user-select: none; -webkit-tap-highlight-color: transparent; font-family: inherit; position: relative; z-index: 20; touch-action: manipulation; }
         .calc-custom-btn:active { box-shadow: inset 2px 2px 5px var(--shadow-dark), inset -2px -2px 5px var(--shadow-light); transform: scale(0.95); }
         .calc-custom-btn.pink { color: var(--accent-pink); }
         .calc-custom-btn.smart { font-size: 0.65rem; color: var(--accent-blue); letter-spacing: 0; padding: 12px 2px; }
@@ -199,7 +199,7 @@
         <div id="pulse-history-container"></div>
     </div>
 
-    <div id="panel-calc" class="main-panel" style="padding: 12px; background: var(--calc-bg);">
+    <div id="panel-calc" class="main-panel" style="padding: 12px; background: var(--calc-bg); z-index: 30;">
         <div class="phone-frame-container">
             <div class="branding-text" style="margin-bottom: 8px;">POWERED BY M.A. GOHAR V.01</div>
             
@@ -212,35 +212,35 @@
             </div>
 
             <div class="white-body-section">
-                <button class="calc-custom-btn smart" onclick="calculateZakat()">ZAKAT</button>
-                <button class="calc-custom-btn smart" onclick="handleGST('A')">GST (A)</button>
-                <button class="calc-custom-btn smart" onclick="handleGST('R')">GST (R)</button>
-                <button class="calc-custom-btn smart" onclick="applyDiscount()">DISC</button>
+                <button class="calc-custom-btn smart" onclick="calculateZakat()" ontouchstart="calculateZakat()">ZAKAT</button>
+                <button class="calc-custom-btn smart" onclick="handleGST('A')" ontouchstart="handleGST('A')">GST (A)</button>
+                <button class="calc-custom-btn smart" onclick="handleGST('R')" ontouchstart="handleGST('R')">GST (R)</button>
+                <button class="calc-custom-btn smart" onclick="applyDiscount()" ontouchstart="applyDiscount()">DISC</button>
 
-                <button class="calc-custom-btn pink" onclick="clearAll()">AC</button>
-                <button class="calc-custom-btn" onclick="chooseOperation('/')">/</button>
-                <button class="calc-custom-btn" onclick="chooseOperation('*')">×</button>
-                <button class="calc-custom-btn pink" onclick="deleteLast()">⌫</button>
+                <button class="calc-custom-btn pink" onclick="clearAll()" ontouchstart="clearAll()">AC</button>
+                <button class="calc-custom-btn" onclick="chooseOperation('/')" ontouchstart="chooseOperation('/')">/</button>
+                <button class="calc-custom-btn" onclick="chooseOperation('*')" ontouchstart="chooseOperation('*')">×</button>
+                <button class="calc-custom-btn pink" onclick="deleteLast()" ontouchstart="deleteLast()">⌫</button>
 
-                <button class="calc-custom-btn" onclick="appendNumber('7')">7</button>
-                <button class="calc-custom-btn" onclick="appendNumber('8')">8</button>
-                <button class="calc-custom-btn" onclick="appendNumber('9')">9</button>
-                <button class="calc-custom-btn pink" onclick="applyPercentage()">%</button>
+                <button class="calc-custom-btn" onclick="appendNumber('7')" ontouchstart="appendNumber('7')">7</button>
+                <button class="calc-custom-btn" onclick="appendNumber('8')" ontouchstart="appendNumber('8')">8</button>
+                <button class="calc-custom-btn" onclick="appendNumber('9')" ontouchstart="appendNumber('9')">9</button>
+                <button class="calc-custom-btn pink" onclick="applyPercentage()" ontouchstart="applyPercentage()">%</button>
 
-                <button class="calc-custom-btn" onclick="appendNumber('4')">4</button>
-                <button class="calc-custom-btn" onclick="appendNumber('5')">5</button>
-                <button class="calc-custom-btn" onclick="appendNumber('6')">6</button>
-                <button class="calc-custom-btn pink" onclick="chooseOperation('-')">-</button>
+                <button class="calc-custom-btn" onclick="appendNumber('4')" ontouchstart="appendNumber('4')">4</button>
+                <button class="calc-custom-btn" onclick="appendNumber('5')" ontouchstart="appendNumber('5')">5</button>
+                <button class="calc-custom-btn" onclick="appendNumber('6')" ontouchstart="appendNumber('6')">6</button>
+                <button class="calc-custom-btn pink" onclick="chooseOperation('-')" ontouchstart="chooseOperation('-')">-</button>
 
-                <button class="calc-custom-btn" onclick="appendNumber('1')">1</button>
-                <button class="calc-custom-btn" onclick="appendNumber('2')">2</button>
-                <button class="calc-custom-btn" onclick="appendNumber('3')">3</button>
-                <button class="calc-custom-btn pink" onclick="chooseOperation('+')">+</button>
+                <button class="calc-custom-btn" onclick="appendNumber('1')" ontouchstart="appendNumber('1')">1</button>
+                <button class="calc-custom-btn" onclick="appendNumber('2')" ontouchstart="appendNumber('2')">2</button>
+                <button class="calc-custom-btn" onclick="appendNumber('3')" ontouchstart="appendNumber('3')">3</button>
+                <button class="calc-custom-btn pink" onclick="chooseOperation('+')" ontouchstart="chooseOperation('+')">+</button>
 
-                <button class="calc-custom-btn smart" onclick="showHistory()">HIST</button>
-                <button class="calc-custom-btn" onclick="appendNumber('0')">0</button>
-                <button class="calc-custom-btn" onclick="appendNumber('.')">.</button>
-                <button class="calc-custom-btn equal" onclick="calculateFinal()">=</button>
+                <button class="calc-custom-btn smart" onclick="showHistory()" ontouchstart="showHistory()">HIST</button>
+                <button class="calc-custom-btn" onclick="appendNumber('0')" ontouchstart="appendNumber('0')">0</button>
+                <button class="calc-custom-btn" onclick="appendNumber('.')" ontouchstart="appendNumber('.')">.</button>
+                <button class="calc-custom-btn equal" onclick="calculateFinal()" ontouchstart="calculateFinal()">=</button>
             </div>
         </div>
     </div>
@@ -274,7 +274,6 @@
         let audioContext = null;
         let pulseMode = 'price';
 
-        // कैलकुलेटर स्टेट्स
         let expression = '';
         let resEl, opsEl;
 
@@ -313,7 +312,6 @@
             }
         }
 
-        // नया कैलकुलेटर सॉफ्ट क्लिक साउंड
         function playSoftClick() {
             const ctx = getAudioContext();
             if (!ctx) return;
@@ -355,7 +353,6 @@
             document.getElementById('radarCont').classList.remove('over');
         }
 
-        // ================= 1. SIMPLE BUDGET LIST CODE =================
         function calculateTotal() {
             if (!document.getElementById('panel-simple').classList.contains('active')) return;
             const priceInputs = document.querySelectorAll('.price-input');
@@ -445,7 +442,6 @@
             alert("Entry Saved with Time: " + timeString);
         }
 
-        // ================= 2. ADVANCE RATEPULSE CODE =================
         function setPulseMode(m) {
             pulseMode = m;
             document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
@@ -577,7 +573,7 @@
             }
         };
 
-        // ================= 3. NEW FIXED RUBBER SMART CALCULATOR CORE MERGED LOGIC =================
+        // ================= 3. NEW FIXED RUBBER SMART CALCULATOR CORE LOGIC =================
         function autoCalculate() {
             if (!expression) { resEl.innerText = '0'; return; }
             try {
@@ -595,9 +591,15 @@
             resEl.style.fontSize = resEl.innerText.length > 9 ? '1.4rem' : '2.2rem';
         }
 
-        function appendNumber(n) { playSoftClick(); expression += n; updateDisplay(); }
+        function appendNumber(n) { 
+            event.preventDefault();
+            playSoftClick(); 
+            expression += n; 
+            updateDisplay(); 
+        }
 
         function chooseOperation(op) {
+            event.preventDefault();
             playSoftClick();
             if (!expression && op === '-') { expression = '-'; updateDisplay(); return; }
             if (!expression) return;
@@ -611,6 +613,7 @@
         }
 
         function calculateFinal() {
+            event.preventDefault();
             playSoftClick();
             if (!expression) return;
             try {
@@ -625,8 +628,20 @@
             }
         }
 
-        function clearAll() { playSoftClick(); expression = ''; resEl.innerText = '0'; updateDisplay(); }
-        function deleteLast() { playSoftClick(); expression = expression.slice(0, -1); updateDisplay(); }
+        function clearAll() { 
+            event.preventDefault();
+            playSoftClick(); 
+            expression = ''; 
+            resEl.innerText = '0'; 
+            updateDisplay(); 
+        }
+        
+        function deleteLast() { 
+            event.preventDefault();
+            playSoftClick(); 
+            expression = expression.slice(0, -1); 
+            updateDisplay(); 
+        }
 
         function saveToHistory(entry) {
             try {
@@ -637,6 +652,7 @@
         }
 
         function showHistory() {
+            event.preventDefault();
             playSoftClick();
             let history = JSON.parse(localStorage.getItem('calcHistory') || '[]');
             if (history.length === 0) { alert("History Khali Hai."); return; }
@@ -648,6 +664,7 @@
         }
 
         function applyPercentage() {
+            event.preventDefault();
             playSoftClick();
             if (!expression) return;
             try { 
@@ -658,6 +675,7 @@
         }
 
         function calculateZakat() {
+            event.preventDefault();
             playSoftClick();
             if (!expression) return;
             try { 
@@ -670,6 +688,7 @@
         }
 
         function applyDiscount() {
+            event.preventDefault();
             playSoftClick();
             let d = prompt("Discount %?");
             if (d && expression) {
@@ -684,6 +703,7 @@
         }
 
         function handleGST(type) {
+            event.preventDefault();
             playSoftClick();
             let r = prompt("GST %?");
             if (r && expression) {
@@ -776,7 +796,6 @@
             const saved = localStorage.getItem(STORAGE_KEY);
             if(saved) items = JSON.parse(saved);
             
-            // नए कैलकुलेटर एलिमेंट्स बाइंडिंग
             resEl = document.getElementById('result');
             opsEl = document.getElementById('current-operation');
 
