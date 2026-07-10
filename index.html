@@ -3,106 +3,150 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>LedgerMate Pro Max 3-in-1</title>
+    <title>LedgerMate Pro Max 3-in-1 | M.A. Gohar</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
-        :root { --primary: #00ff41; --bg: #0d0d0d; --danger: #ff0000; --glass: #ffffff; }
-        body { font-family: 'Consolas', sans-serif; background: var(--bg); color: #fff; margin: 0; padding: 20px; display: flex; flex-direction: column; align-items: center; }
-        .main-panel { display: none; width: 100%; max-width: 400px; background: #fff; color: #333; padding: 20px; border-radius: 20px; }
+        :root {
+            --primary-green: #00ff41;
+            --dark-green: #003b00;
+            --radar-bg: #050a05;
+            --danger-red: #ff0000;
+            --bg-dark: #0d0d0d;
+            --glass-white: rgba(255, 255, 255, 0.98);
+            --calc-bg: #e0e5ec;
+            --shadow-light: #ffffff;
+            --shadow-dark: #a3b1c6;
+            --text-color: #44474a;
+            --accent-pink: #ff4d8d;
+            --accent-blue: #6366f1;
+        }
+        * { box-sizing: border-box; }
+        body { font-family: 'Consolas', 'Segoe UI', monospace; background-color: var(--bg-dark); margin: 0; display: flex; flex-direction: column; align-items: center; min-height: 100vh; color: #fff; padding-bottom: 20px; }
+        #marquee-container { width: 100%; background-color: #000; border-bottom: 1px solid var(--primary-green); padding: 5px 0; color: var(--primary-green); text-shadow: 0 0 5px var(--primary-green); font-weight: bold; text-align: center; }
+        #radar-section { background-color: var(--radar-bg); width: 100%; display: flex; justify-content: center; padding: 15px 0; border-bottom: 2px solid #222; position: relative; }
+        .radar-container { width: 110px; height: 110px; position: relative; border-radius: 50%; background: radial-gradient(circle, #0a200a 0%, #050a05 100%); border: 3px solid #333; box-shadow: 0 0 20px rgba(0,0,0,0.5); overflow: hidden; }
+        .radar-container::before { content: ""; position: absolute; top: 0; left: 0; right: 0; bottom: 0; border-radius: 50%; background-image: radial-gradient(circle, transparent 20%, rgba(0, 255, 65, 0.1) 21%, transparent 22%, transparent 40%, rgba(0, 255, 65, 0.1) 41%, transparent 42%); }
+        .sweep { width: 50%; height: 50%; background: conic-gradient(from 0deg, var(--primary-green) 0%, transparent 30%); position: absolute; top: 0; left: 50%; transform-origin: bottom left; animation: rotate 4s linear infinite; filter: blur(1px); }
+        .radar-container.over { border-color: var(--danger-red); box-shadow: 0 0 30px rgba(255, 0, 0, 0.4); }
+        .radar-container.over .sweep { background: conic-gradient(from 0deg, var(--danger-red) 0%, transparent 40%); animation: rotate 1s linear infinite; }
+        @keyframes rotate { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+        .mode-switcher-bar { width: 92%; max-width: 450px; display: flex; gap: 5px; margin: 15px 0 0 0; background: #222; padding: 5px; border-radius: 12px; border: 1px solid #444; }
+        .mode-switch-btn { flex: 1; background: transparent; border: none; color: #aaa; padding: 10px 5px; font-size: 0.7rem; font-weight: bold; font-family: inherit; border-radius: 8px; cursor: pointer; transition: 0.2s; display: flex; flex-direction: column; align-items: center; gap: 4px; }
+        .mode-switch-btn.active { background: var(--dark-green); color: var(--primary-green); border: 1px solid var(--primary-green); }
+        .main-panel { display: none; background: var(--glass-white); color: #333; border-radius: 25px; padding: 20px; width: 92%; max-width: 450px; margin: 15px 0 20px 0; position: relative; z-index: 5; box-shadow: 0 10px 40px rgba(0,0,0,0.5); }
         .main-panel.active { display: block; }
-        .btn-nav { width: 100%; max-width: 400px; display: flex; gap: 5px; margin-bottom: 20px; }
-        .btn-nav button { flex: 1; padding: 10px; border: none; background: #333; color: #fff; border-radius: 8px; cursor: pointer; }
-        .btn-nav button.active { background: var(--primary); color: #000; font-weight: bold; }
-        input { width: 100%; padding: 10px; margin: 5px 0; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box; }
-        button.action { width: 100%; padding: 12px; background: #2e7d32; color: white; border: none; border-radius: 8px; margin-top: 10px; }
+        .branding-text { text-align: center; font-size: 0.65em; font-weight: bold; color: #888; margin-bottom: 2px; letter-spacing: 1px; }
+        #total-display, .pulse-display-head { padding: 15px; background: #eef7ee; border: 2px solid var(--primary-green); border-radius: 15px; text-align: center; font-weight: bold; font-size: 1.4em; margin-bottom: 15px; color: var(--dark-green); width: 100%; }
+        #total-display.over, .pulse-display-head.over { border-color: var(--danger-red); background: #fff5f5; color: var(--danger-red); }
+        .diff-amount { font-size: 0.5em; display: block; color: var(--danger-red); }
+        .budget-box { background: #f0f0f0; padding: 12px; border-radius: 12px; border-left: 5px solid #666; display: flex; justify-content: space-between; margin-bottom: 15px; color: #333; font-size: 0.9em; align-items: center; width: 100%; }
+        .budget-box input { width: 90px; border: 1px solid #ccc; padding: 5px; border-radius: 5px; font-weight: bold; text-align: center; }
+        .item-entry { display: flex; gap: 5px; margin-bottom: 10px; align-items: center; width: 100%; }
+        .item-entry input, .form-section input, .form-section select { padding: 10px; border-radius: 8px; border: 1px solid #ddd; font-size: 14px; background: #fff; color: #333; width: 100%; }
+        button { border: none; border-radius: 10px; padding: 12px; font-weight: bold; cursor: pointer; }
+        #add-item-btn { width: 100%; background: #eee; color: #333; margin-bottom: 15px; border: 1px dashed #999; }
+        .btn-row { display: flex; gap: 10px; width: 100%; }
+        .btn-row button { flex: 1; }
+        #save-btn, .execute-btn { background: #2e7d32; color: white; width: 100%; }
+        #history-toggle-btn { background: #1565c0; color: white; }
+        .delete-btn { background: #ffebee; color: #c62828; min-width: 35px; }
+        .form-section { background: #f9f9f9; padding: 12px; border: 1px solid #e0e0e0; border-radius: 15px; margin-bottom: 15px; }
+        .row { display: flex; gap: 8px; margin-bottom: 8px; }
+        .calc-preview { background: #e3f2fd; color: #1565c0; padding: 10px; border-radius: 8px; font-size: 0.75rem; font-weight: bold; margin-bottom: 10px; text-align: center; }
+        .phone-frame-container { background: var(--calc-bg); border-radius: 25px; padding: 15px; }
+        .top-display { background: var(--calc-bg); border-radius: 20px; padding: 15px; box-shadow: inset 5px 5px 10px var(--shadow-dark), inset -5px -5px 10px var(--shadow-light); margin-bottom: 15px; min-height: 90px; }
+        #result { color: var(--text-color); font-size: 2.2rem; font-weight: 800; text-align: right; }
+        .white-body-section { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+        .calc-custom-btn { background: var(--calc-bg); border: none; border-radius: 12px; color: var(--text-color); padding: 14px 5px; font-size: 1.05rem; font-weight: 700; box-shadow: 4px 4px 8px var(--shadow-dark), -4px -4px 8px var(--shadow-light); }
+        .calc-custom-btn.pink { color: var(--accent-pink); }
+        .calc-custom-btn.equal { background: var(--accent-pink); color: white; }
     </style>
 </head>
 <body>
 
-    <div class="btn-nav">
-        <button class="active" onclick="show('simple')">LIST</button>
-        <button onclick="show('pulse')">PULSE</button>
-        <button onclick="show('calc')">CALCULATER</button>
+    <div id="marquee-container"><marquee scrollamount="4">Smart Shopping Hub 3-in-1 V7.5 Powered By M.A. GOHAR</marquee></div>
+    
+    <div id="radar-section">
+        <div class="radar-container" id="radarCont"><div class="sweep"></div></div>
     </div>
 
-    <!-- SIMPLE LIST -->
+    <div class="mode-switcher-bar">
+        <button class="mode-switch-btn active" id="nav-simple" onclick="switchMode('simple')">LIST</button>
+        <button class="mode-switch-btn" id="nav-advance" onclick="switchMode('advance')">PULSE</button>
+        <button class="mode-switch-btn" id="nav-calc" onclick="switchMode('calc')">CALC</button>
+    </div>
+
+    <!-- PANEL: LIST -->
     <div id="panel-simple" class="main-panel active">
-        <h3>Simple List</h3>
-        <div id="list-items"></div>
-        <button class="action" onclick="addItem()">+ Add Item</button>
-        <div id="total-val" style="margin-top:10px; font-weight:bold;">Total: 0</div>
+        <div id="total-display">TOTAL: ₹ <span id="total-amount">0.00</span></div>
+        <div id="item-list"></div>
+        <button id="add-item-btn" onclick="addItem()">+ Add Item</button>
     </div>
 
-    <!-- RATEPULSE -->
-    <div id="panel-pulse" class="main-panel">
-        <h3>RatePulse</h3>
-        <input type="text" id="p-name" placeholder="Item Name">
-        <input type="number" id="p-price" placeholder="Price" oninput="calcPulse()">
-        <div id="p-res" style="font-weight:bold;">Result: 0</div>
+    <!-- PANEL: PULSE -->
+    <div id="panel-advance" class="main-panel">
+        <div class="form-section">
+            <input type="text" id="p-name" placeholder="Item Name">
+            <input type="number" id="p-price" placeholder="Price" oninput="runPulse()">
+            <div id="p-res" class="calc-preview">Result</div>
+        </div>
     </div>
 
-    <!-- CALCULATOR -->
+    <!-- PANEL: CALC -->
     <div id="panel-calc" class="main-panel">
-        <div id="calc-display" style="background:#eee; padding:15px; text-align:right; font-size:1.5em; border-radius:10px; margin-bottom:10px;">0</div>
-        <div style="display:grid; grid-template-columns: repeat(4, 1fr); gap: 5px;">
-            <button onclick="cVal('1')">1</button><button onclick="cVal('2')">2</button><button onclick="cVal('3')">3</button><button onclick="cVal('+')">+</button>
-            <button onclick="cVal('4')">4</button><button onclick="cVal('5')">5</button><button onclick="cVal('6')">6</button><button onclick="cVal('-')">-</button>
-            <button onclick="cVal('7')">7</button><button onclick="cVal('8')">8</button><button onclick="cVal('9')">9</button><button onclick="cVal('*')">*</button>
-            <button onclick="cClear()">C</button><button onclick="cVal('0')">0</button><button onclick="cCalc()">=</button><button onclick="cVal('/')">/</button>
+        <div class="top-display"><div id="result">0</div></div>
+        <div class="white-body-section">
+            <button class="calc-custom-btn" onclick="cVal('1')">1</button><button class="calc-custom-btn" onclick="cVal('2')">2</button><button class="calc-custom-btn" onclick="cVal('3')">3</button><button class="calc-custom-btn pink" onclick="cClear()">AC</button>
+            <button class="calc-custom-btn" onclick="cVal('4')">4</button><button class="calc-custom-btn" onclick="cVal('5')">5</button><button class="calc-custom-btn" onclick="cVal('6')">6</button><button class="calc-custom-btn pink" onclick="cCalc()">=</button>
         </div>
     </div>
 
     <script>
         // --- SAFE STORAGE ---
-        function saveData(key, data) { try { localStorage.setItem(key, JSON.stringify(data)); } catch(e){} }
-        function loadData(key, fallback) { try { const d = localStorage.getItem(key); return d ? JSON.parse(d) : fallback; } catch(e) { return fallback; } }
+        function loadDB(key) { try { return JSON.parse(localStorage.getItem(key)) || []; } catch(e) { return []; } }
+        function saveDB(key, data) { try { localStorage.setItem(key, JSON.stringify(data)); } catch(e) {} }
 
         // --- NAVIGATION ---
-        function show(mode) {
+        function switchMode(m) {
             document.querySelectorAll('.main-panel').forEach(p => p.classList.remove('active'));
-            document.querySelectorAll('.btn-nav button').forEach(b => b.classList.remove('active'));
-            document.getElementById('panel-' + mode).classList.add('active');
-            event.target.classList.add('active');
+            document.querySelectorAll('.mode-switch-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById('panel-' + m).classList.add('active');
+            document.getElementById('nav-' + m).classList.add('active');
         }
 
-        // --- SIMPLE LIST LOGIC ---
-        let items = loadData('my_items', []);
-        function addItem() { items.push({n:'', p:0}); render(); saveData('my_items', items); }
+        // --- LIST LOGIC ---
+        let items = loadDB('items');
+        function addItem() { items.push({n:'', p:0}); render(); }
         function render() {
-            const container = document.getElementById('list-items');
+            let container = document.getElementById('item-list');
             container.innerHTML = '';
             let total = 0;
             items.forEach((item, i) => {
-                total += parseFloat(item.p) || 0;
-                container.innerHTML += `<div><input value="${item.n}" oninput="update(${i}, 'n', this.value)"> <input value="${item.p}" oninput="update(${i}, 'p', this.value)"></div>`;
+                total += parseFloat(item.p || 0);
+                container.innerHTML += `<div class="item-entry"><input value="${item.n}" oninput="items[${i}].n=this.value; saveDB('items', items)"> <input type="number" value="${item.p}" oninput="items[${i}].p=this.value; saveDB('items', items); render()"></div>`;
             });
-            document.getElementById('total-val').innerText = "Total: " + total;
+            document.getElementById('total-amount').innerText = total.toFixed(2);
         }
-        function update(i, f, v) { items[i][f] = v; saveData('my_items', items); render(); }
         render();
 
-        // --- PULSE LOGIC ---
-        function calcPulse() {
-            let p = document.getElementById('p-price').value;
-            document.getElementById('p-res').innerText = "Result: " + (p * 1);
-        }
-
-        // --- SAFE CALCULATOR (NO EVAL) ---
-        let calcExpr = "";
-        function cVal(v) { calcExpr += v; document.getElementById('calc-display').innerText = calcExpr; }
-        function cClear() { calcExpr = ""; document.getElementById('calc-display').innerText = "0"; }
+        // --- CALC LOGIC (SAFE) ---
+        let expr = "";
+        function cVal(v) { expr += v; document.getElementById('result').innerText = expr; }
+        function cClear() { expr = ""; document.getElementById('result').innerText = "0"; }
         function cCalc() {
             try {
-                // यह सुरक्षित Math Parser है जो eval() का इस्तेमाल नहीं करता
-                let res = new Function('return ' + calcExpr.replace(/[^0-9+\-*/.]/g, ''))();
-                calcExpr = res.toString();
-                document.getElementById('calc-display').innerText = calcExpr;
-            } catch(e) { 
-                document.getElementById('calc-display').innerText = "Error";
-                calcExpr = "";
-            }
+                // यह सुरक्षित Parser है, eval का उपयोग नहीं करता
+                let res = new Function('return ' + expr.replace(/[^0-9+\-*/.]/g, ''))();
+                expr = res.toString();
+                document.getElementById('result').innerText = expr;
+            } catch(e) { document.getElementById('result').innerText = "Error"; expr = ""; }
+        }
+
+        // --- PULSE LOGIC ---
+        function runPulse() {
+            let p = document.getElementById('p-price').value;
+            document.getElementById('p-res').innerText = "Total: " + (p * 1);
         }
     </script>
 </body>
-    </html>
-    
+</html>
